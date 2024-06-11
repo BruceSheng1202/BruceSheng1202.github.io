@@ -21,14 +21,17 @@
         .profile-container {
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center; /* Center the entire container */
+            gap: 20px; /* Adjust the gap between the image and text */
+            margin-top: 50px; /* Adjust margin to your preference */
         }
         .profile-image {
-            width: 20%;
-            min-width: 100px; /* Adjust this value as needed */
+            width: 150px; /* Adjust the image size as needed */
+            height: auto;
         }
         .profile-text {
-            flex: 1;
+            max-width: 600px; /* Limit the width of the text section */
+            text-align: left;
         }
     </style>
     <meta name="google-site-verification" content="qEih9m0y-6X0QuisQYfHSxOvkW-o5Q3dfxuQ5Z4JtGA" />
@@ -50,21 +53,21 @@
     <!-- Page Content -->
     <div class="container">
         <!-- Heading Row -->
-        <div class="row my-4 profile-container">
-            <div class="col-lg-3">
+        <div class="row my-4">
+            <div class="col-12 profile-container">
                 <img alt="" class="img-fluid rounded img-responsive profile-image" src="img/profile.jpg" />
-            </div>
-            <div class="col-lg-9 profile-text">
-                <h1>Huanxin Sheng</h1>
-                <p>Email: hsheng2 [at] ur [dot] rochester [dot] edu</p>
-                <p class="m-0">
-                    I'm an incoming CS PhD student for 2024Fall in the Department of Computer Science at the University of Rochester(UR) 
-                    under the supervision of <span style="color:#4169E1"><a href="https://jiank2.github.io/">Dr. Jian Kang</a></span>.
-                    Presently I'm also a member of <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/">XMU MIREL Lab</a></span>  led by <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a></span></a>.     
-                    My research interest lies in data mining and machine learning related to Economics, Finance, BioInfo and High-Dimensional Statistics etc.
-                    Prior to be a CS PhD student at UR, I will received my B.Sc degree in Statistics at Xiamen University, where I am lucky to be advised by 
-                    <span style="color:#4169E1"><a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a></span>.
-                </p>
+                <div class="profile-text">
+                    <h1>Huanxin Sheng</h1>
+                    <p>Email: hsheng2 [at] ur [dot] rochester [dot] edu</p>
+                    <p class="m-0">
+                        I'm an incoming CS PhD student for 2024Fall in the Department of Computer Science at the University of Rochester(UR) 
+                        under the supervision of <span style="color:#4169E1"><a href="https://jiank2.github.io/">Dr. Jian Kang</a></span>.
+                        Presently I'm also a member of <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/">XMU MIREL Lab</a></span>  led by <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a></span></a>.     
+                        My research interest lies in data mining and machine learning related to Economics, Finance, BioInfo and High-Dimensional Statistics etc.
+                        Prior to be a CS PhD student at UR, I will received my B.Sc degree in Statistics at Xiamen University, where I am lucky to be advised by 
+                        <span style="color:#4169E1"><a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a></span>.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

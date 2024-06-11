@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="gbk">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,7 +7,8 @@
     <meta name="author" content="">
     <title>Huanxin Sheng</title>
     <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" /><!-- Custom styles for this template -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom styles for this template -->
     <link href="css/small-business.css" rel="stylesheet" />
     <link href="css/all.css" rel="stylesheet" />
     <link href="css/academicons.css" rel="stylesheet" />
@@ -16,14 +16,26 @@
     <style type="text/css">
         .content {
             margin-top: 0;
-            margin-bottom: 0
+            margin-bottom: 0;
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .profile-image {
+            width: 20%;
+            min-width: 150px; /* Adjust this value as needed */
+        }
+        .profile-text {
+            flex: 1;
         }
     </style>
     <meta name="google-site-verification" content="qEih9m0y-6X0QuisQYfHSxOvkW-o5Q3dfxuQ5Z4JtGA" />
 </head>
 
-<body><!-- Navigation -->
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"> -->
+<body>
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #00205B;">
         <div class="container">
             <strong><a class="text-white navbar-brand" href="index.html">
@@ -33,41 +45,31 @@
                 class="navbar-toggler" data-target="#navbarResponsive" data-toggle="collapse" type="button">
                 <span class="navbar-toggler-icon my-toggler"></span>
             </button>
-            <style type="text/css">
-                .content { margin-top: 0; margin-bottom: 0 }
-                .navbar-brand { color: white; }
-            </style>
-
         </div>
     </nav>
-    
     <!-- Page Content -->
-        <div class="container">
+    <div class="container">
         <!-- Heading Row -->
-        <div class="row my-4">
+        <div class="row my-4 profile-container">
             <div class="col-lg-3">
-                <img alt="Profile" class="img-fluid rounded img-responsive" src="img/profile.jpg" style="max-width: 100%; height: auto;"/>
+                <img alt="" class="img-fluid rounded img-responsive profile-image" src="img/profile.jpg" />
             </div>
-            <div class="col-lg-9">
+            <div class="col-lg-9 profile-text">
                 <h1>Huanxin Sheng</h1>
-                    <p>Email: hsheng2 [at] ur [dot] rochester [dot] edu</p> 
-                    <p class="m-0">I'm an incoming CS PhD student for 2024Fall in the Department of Computer Science at the University of Rochester(UR) 
-                        under the supervision of <a href="https://jiank2.github.io/">Dr. Jian Kang</a>.
-                        Presently I'm also a member of XMU MIREL Lab led by <a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a>.     
-                        My research interest lies in data mining and machine learning related to Economics, Finance, BioInfo and High-Dimensional Statistics etc.
-                        Prior to be a CS PhD student at UR, I will received my B.Sc degree in Statistics at Xiamen University, where I am lucky to be advised by 
-                        <a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a>.
-                    </p>
+                <p>Email: hsheng2 [at] ur [dot] rochester [dot] edu</p>
+                <p class="m-0">
+                    I'm an incoming CS PhD student for 2024Fall in the Department of Computer Science at the University of Rochester(UR) 
+                    under the supervision of <span style="color:#4169E1"><a href="https://jiank2.github.io/">Dr. Jian Kang</a></span>.
+                    Presently I'm also a member of XMU MIREL Lab <a href="https://mirel.xmu.edu.cn/">led by <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a></span></a>.     
+                    My research interest lies in data mining and machine learning related to Economics, Finance, BioInfo and High-Dimensional Statistics etc.
+                    Prior to be a CS PhD student at UR, I will received my B.Sc degree in Statistics at Xiamen University, where I am lucky to be advised by 
+                    <span style="color:#4169E1"><a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a></span>.
+                </p>
             </div>
-            </div>
-            <!-- /.row -->
         </div>
-    <!-- /.container -->
-
-
+    </div>
     <!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

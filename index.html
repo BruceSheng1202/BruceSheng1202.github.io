@@ -1,90 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="gbk">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Huanxin Sheng's academic homepage">
+    <meta name="author" content="Huanxin Sheng">
     <title>Huanxin Sheng</title>
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Custom styles for this template -->
-    <link href="css/small-business.css" rel="stylesheet" />
-    <link href="css/all.css" rel="stylesheet" />
-    <link href="css/academicons.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <style type="text/css">
+    
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.1/css/academicons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+
+    <style>
         body {
-            font-size: 1.2em; /* Increase the base font size */
+            padding-top: 56px; /* Adjust for fixed-top navbar */
+            font-size: 1.1em;
+            line-height: 1.6;
         }
-        .container {
-            max-width: 90%; /* Reduce the page margins */
-        }
-        .profile-container {
-            display: flex;
-            align-items: center;
-            justify-content: center; /* Center the entire container */
-            gap: 40px; /* Adjust the gap between the image and text to make it larger */
-            margin-top: 50px; /* Adjust margin to your preference */
-        }
-        .profile-image {
-            width: 400px; /* Increase the image size */
-            height: auto;
-        }
-        .profile-text {
-            max-width: 800px; /* Increase the width of the text section */
-            text-align: justify; /* Justify the text */
+        .navbar {
+            background-color: #00205B !important;
         }
         .navbar-brand {
-            width: 400%; /* Increase the width of the navbar brand */
-            color: white !important; /* Change the title color to white */
-            text-indent: 100px; /* Indent the text */
-            text-decoration: none !important; /* Remove underline */
+            color: white !important;
+            font-weight: bold;
         }
-        .navbar-toggler {
-            display: none; /* Remove the button */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+        }
+        .profile-image {
+            width: 300px; /* Adjusted size */
+            height: auto;
+            border-radius: 8px;
+        }
+        .profile-text {
+            max-width: 650px;
+            text-align: justify;
+        }
+        .profile-text h1 {
+            margin-bottom: 0.5rem;
+        }
+        .profile-text p {
+            margin-bottom: 1rem;
+        }
+        .social-icons a {
+            font-size: 1.8em; /* Larger icons */
+            margin-right: 15px;
+            color: #333;
+            transition: color 0.2s;
+        }
+        .social-icons a:hover {
+            color: #00205B;
+        }
+        .section-divider {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .publication-item {
+            margin-bottom: 1.5rem;
+        }
+        .publication-item strong {
+            display: block; /* Puts title on its own line */
+            font-size: 1.1em;
+        }
+        a {
+            color: #4169E1;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
     <meta name="google-site-verification" content="qEih9m0y-6X0QuisQYfHSxOvkW-o5Q3dfxuQ5Z4JtGA" />
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #00205B;">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <strong><a class="navbar-brand" href="index.html">
-                    Huanxin Sheng
-                </a></strong>
-        </div>
+            <a class="navbar-brand" href="#">Huanxin Sheng</a>
+            </div>
     </nav>
-    <!-- Page Content -->
-    <div class="container">
-        <!-- Heading Row -->
-        <div class="row my-4">
-            <div class="col-12 profile-container">
-                <img alt="" class="img-fluid rounded img-responsive profile-image" src="img/profile_2_big.jpg" />
+
+    <main class="container">
+        <section id="about" class="row my-4">
+            <div class="col-12 profile-section">
+                <img class="img-fluid profile-image" src="img/profile_2_big.jpg" alt="Profile picture of Huanxin Sheng" />
                 <div class="profile-text">
                     <h1>Huanxin Sheng</h1>
                     <p>Email: hsheng2 [at] ur [dot] rochester [dot] edu</p>
-                    <p>
-                        I am a first-year CS PhD student since Fall 2024. 
-                        I am lucky to be advised by <span style="color:#4169E1"><a href="https://jiank2.github.io/">Dr. Jian Kang</a></span> at the University of Rochester(UR). 
+                    <p class="social-icons">
+                        <a href="#" title="Google Scholar"><i class="ai ai-google-scholar-square"></i></a>
+                        <a href="#" title="GitHub"><i class="fab fa-github-square"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" title="Download CV"><i class="ai ai-cv-square"></i></a>
                     </p>
                     <p>
-                        My research interest lies in graph mining and machine learning for social good. Presently I am exploring conformal prediction and graph learning. 
-                        <!-- I have BASIC experience in sentiment analysis in NLP, graph classification in CV and synthetic control method in Econometrics. -->
+                        I am a second-year CS PhD student since Fall 2024. 
+                        I am lucky to be advised by <a href="https://jiank2.github.io/">Dr. Jian Kang</a> at the University of Rochester (UR).
+                    </p>
+                    <p>
+                        My research interest lies in graph mining and machine learning for social good. Presently I am exploring conformal prediction and graph learning.
                     </p>
                     <p>
                         Before my PhD journey at UR, I completed my Bachelor of Science degree in Statistics at Xiamen University, where
-                        I was lucky to be advised by <span style="color:#4169E1"><a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a></span>. I was a member of <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/">XMU MIREL Lab</a></span>
-                        led by <span style="color:#4169E1"><a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a></span>. I was also a remote research assistant for <span style="color:#4169E1"><a href="https://michaelqfan.weebly.com/">Dr. Qingliang Fan</a></span> at the Chinese University of Hong Kong.    
+                        I was lucky to be advised by <a href="https://scholar.google.com/citations?user=TZE0kMAAAAAJ&hl">Dr. Wei Zhong</a>. I was a member of <a href="https://mirel.xmu.edu.cn/">XMU MIREL Lab</a>
+                        led by <a href="https://mirel.xmu.edu.cn/wu/">Dr. Yunfeng Wu</a>. I was also a remote research assistant for <a href="https://michaelqfan.weebly.com/">Dr. Qingliang Fan</a> at the Chinese University of Hong Kong.
                     </p>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="news">
+            <h2>News</h2>
+            <ul>
+                <li>[Sep 2024] Started my PhD journey at the University of Rochester.</li>
+                </ul>
+        </section>
+
+        <hr class="section-divider">
+
+        <section id="publications">
+            <h2>Publications</h2>
+            <div class="publication-item">
+                <strong>Analyzing Uncertainty of LLM-as-a-Judge: Interval Evaluations with Conformal Prediction</strong>
+                <span><strong>Huanxin Sheng</strong>, Xinyi Liu, Hangfeng He, Jieyu Zhao, Jian Kang</span><br>
+                <span><em>EMNLP (main, poster), 2025</em></span><br>
+                <span>[<a href="https://arxiv.org/abs/2509.18658">PDF</a>] [<a href="https://github.com/BruceSheng1202/Analyzing_Uncertainty_of_LLM-as-a-Judge">Code</a>] [<a href="#">Slides</a>]</span>
+            </div>
+             </section>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

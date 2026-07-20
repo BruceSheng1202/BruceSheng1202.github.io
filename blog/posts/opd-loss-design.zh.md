@@ -114,10 +114,7 @@ EMA-PG ([Zhang & Ba, 2026](https://arxiv.org/pdf/2602.04417)) 归纳了 [Schulma
 既然如此，有没有能够绕开这个问题的方法呢？
 
 ## 4.2 Centered Kernel Alignment: 不完美的相似度
-Relational knowledge distillation ([Park et al., 2019](https://arxiv.org/pdf/1904.05068)) 就是用于解决这一类问题的办法，即我们不在每一个学习样本上做强行近似，而是根据样本间的相似性关系来实现蒸馏。Centered Kernel Alignment (CKA) ([Kornblith et al., 2019](https://arxiv.org/abs/1905.00414)) 就是这一类方法中典型而热门的方法。具体的，我们延续 [Dasgupta and Cohn (2025)](https://openreview.net/forum?id=IcVSKhVpKu) 的思路，首先取出两个模型某一层的 hidden states 向量，并将每个 token 视为一个样本，从而整个 batch 上的 token 拼出一个 hidden states 矩阵,$ H^s
-
- $和$ H^t
- $。对这两个矩阵归一化后自乘计算 Gram 矩阵 $ K $，即可计算 CKA：
+Relational knowledge distillation ([Park et al., 2019](https://arxiv.org/pdf/1904.05068)) 就是用于解决这一类问题的办法，即我们不在每一个学习样本上做强行近似，而是根据样本间的相似性关系来实现蒸馏。Centered Kernel Alignment (CKA) ([Kornblith et al., 2019](https://arxiv.org/abs/1905.00414)) 就是这一类方法中典型而热门的方法。具体而言，我们延续 [Dasgupta and Cohn (2025)](https://openreview.net/forum?id=IcVSKhVpKu) 的思路，首先取出两个模型某一层的 hidden states 向量，并将每个 token 视为一个样本。这样，整个 batch 中的 token 分别构成 student 和 teacher 的 hidden-state 矩阵 $H^s$ 与 $H^t$。对两个矩阵归一化后，分别与自身的转置相乘得到 Gram 矩阵 $K^s$ 与 $K^t$，即可计算 CKA：
 
 $$
 \mathcal{L}_{CKA} = 1\ -CKA(H^t,H^s) = 1\ - \ \frac{tr(K^tK^s)}{||K^t||_F\ ||K^s||_F}.
@@ -127,13 +124,13 @@ $$
 
 搞不懂这些复杂的数学，简单来说就是它测度了两个模型在一大堆 token 预测上的相似度：尽管基于不同的推理语境，但在相似的位置上两个模型在 hidden states 上的思考反应应该得是尽可能相似的。例如在一个问题回答里出现了 “1+1=2” 这个命题，在“2”这个位置上的预测反应，应该和在另一个回答中的“1+1=2”上相似。
 
-它的好处在于自乘 Gram 矩阵之际，两个模型 hidden states 的 dimension mismatch 的问题被消除：
+它的优势在于：将 hidden-state 矩阵与自身的转置相乘得到 Gram 矩阵后，student 与 teacher 之间的 hidden-state 维度差异不再影响计算：
 
 $$
-K^t = \tilde{H}^t{\tilde{H}^t}^T, \ K_s = \tilde{H}^s{\tilde{H}^s}^T \in \mathbb{R}^{N\times N},
+K^t = \tilde{H}^t{\tilde{H}^t}^T, \ K^s = \tilde{H}^s{\tilde{H}^s}^T \in \mathbb{R}^{N\times N},
 $$
 
-$N$ 是样本量
+其中，$N$ 表示一个 batch 中参与计算的 token 样本数。
 
 从而这种损失设计天然适用于不同尺寸模型间的蒸馏：**只要是相对应的同一层，就可以蒸馏，维度无关**。
 

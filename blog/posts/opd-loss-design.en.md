@@ -123,7 +123,7 @@ If the mathematics sounds complicated, the simple explanation is that CKA measur
 Its advantage is that multiplying each hidden-state matrix by itself to form a Gram matrix eliminates the dimensional mismatch between the two models' hidden states:
 
 $$
-K^t = \tilde{H}^t{\tilde{H}^t}^T, \ K_s = \tilde{H}^s{\tilde{H}^s}^T \in \mathbb{R}^{N\times N},
+K^t = \tilde{H}^t{\tilde{H}^t}^T, \ K^s = \tilde{H}^s{\tilde{H}^s}^T \in \mathbb{R}^{N\times N},
 $$
 
 where $N$ is the number of samples.

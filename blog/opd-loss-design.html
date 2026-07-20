@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A bilingual field note on loss design for on-policy distillation.">
+  <title>On-Policy Distillation — Huanxin Sheng</title>
+  <link rel="stylesheet" href="style.css">
+  <script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']]},svg:{fontCache:'global'}};</script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="posts/opd-content.js"></script>
+</head>
+<body>
+  <header class="topbar"><nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="../index.html">Huanxin Sheng</a>
+    <div class="navlinks"><a href="../index.html">Homepage</a><a href="index.html" aria-current="page">Blog</a></div>
+  </nav></header>
+  <main class="article-shell">
+    <aside id="toc" class="toc" aria-label="Table of contents">
+      <div class="toc-title" data-en="On this page" data-zh="本文目录">On this page</div>
+      <div id="toc-links"></div>
+    </aside>
+    <div class="article-main">
+      <header class="article-head">
+        <h1 data-en="On-Policy Distillation: Discussion of Loss Design" data-zh="On-Policy Distillation：重塑损失的权利">On-Policy Distillation: Discussion of Loss Design</h1>
+        <p class="dek" data-en="A practical look at reverse KL, better estimators, Top-K truncation, and why representation distillation still struggles in on-policy settings." data-zh="从反向 KL、更优估计量、Top-K 截断到表征蒸馏：哪些方法真正适合 on-policy 场景？">A practical look at reverse KL, better estimators, Top-K truncation, and why representation distillation still struggles in on-policy settings.</p>
+        <div class="meta article-meta">
+          <span>Huanxin Sheng</span><span>·</span><span>July 2026</span><span>·</span><span data-en="18 min read" data-zh="约 18 分钟阅读">18 min read</span>
+          <div class="lang article-lang" aria-label="Article language"><button data-lang="en">EN</button><button data-lang="zh">中文</button></div>
+        </div>
+      </header>
+      <article id="article" class="article" aria-live="polite"><p>Loading…</p></article>
+    </div>
+    <aside id="citation-rail" class="citation-rail" aria-label="References cited alongside the article">
+      <div id="citation-notes"></div>
+    </aside>
+  </main>
+  <footer class="footer"><div class="wrap"><a href="index.html" data-en="← All notes" data-zh="← 返回全部文章">← All notes</a></div></footer>
+  <script src="language.js"></script>
+  <script>
+    let request = 0;
+    const giscusConfig = Object.freeze({
+      repo: 'BruceSheng1202/BruceSheng1202.github.io',
+      repoId: 'R_kgDOMH0GSg',
+      category: 'Blog Comments',
+      categoryId: 'DIC_kwDOMH0GSs4DBPJB',
+      term: 'opd-loss-design'
+    });
+    let tocHeadings = [];
+    let tocFrame = 0;
+    let citationFrame = 0;
+    function slug(text, i) { return text.toLowerCase().replace(/<[^>]+>/g,'').replace(/[^a-z0-9\u4e00-\u9fff]+/g,'-').replace(/^-|-$/g,'') || `section-${i}`; }
+    function citationKey(href) {
+      try {
+        const url = new URL(href, location.href);
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        if (host === 'arxiv.org') {
+          const match = url.pathname.match(/\/(?:abs|pdf)\/([^/]+?)(?:\.pdf)?$/);
+          if (match) return `arxiv:${match[1].replace(/v\d+$/i, '')}`;
+        }
+        if (host === 'openreview.net') {
+          return `openreview:${url.searchParams.get('id') || url.pathname.replace(/\/$/, '')}`;
+        }
+        if (host === 'doi.org') return `doi:${url.pathname.replace(/^\/|\/$/g, '').toLowerCase()}`;
+        return `${host}${url.pathname.replace(/\/$/, '')}${url.search}`;
+      } catch (_) {
+        return href;
+      }
+    }
+    function updateToc() {
+      if (!tocHeadings.length) return;
+      let current = tocHeadings[0];
+      for (const heading of tocHeadings) {
+        if (heading.getBoundingClientRect().top <= 118) current = heading;
+        else break;
+      }
+      document.querySelectorAll('#toc-links a').forEach(link => {
+        const active = link.getAttribute('href') === `#${current.id}`;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+    function scheduleTocUpdate() {
+      cancelAnimationFrame(tocFrame);
+      tocFrame = requestAnimationFrame(updateToc);
+    }
+    function buildToc(headings) {
+      tocHeadings = headings;
+      const toc = document.getElementById('toc-links');
+      toc.innerHTML = '';
+      headings.forEach(h => {
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.textContent = h.textContent;
+        if (h.tagName === 'H2') a.className = 'toc-subsection';
+        toc.appendChild(a);
+      });
+      scheduleTocUpdate();
+    }
+    function layoutCitationNotes() {
+      const rail = document.getElementById('citation-rail');
+      const main = document.querySelector('.article-main');
+      const notes = [...document.querySelectorAll('.citation-note')];
+      if (!rail || !main || !notes.length) return;
+      rail.style.minHeight = `${main.offsetHeight}px`;
+      if (getComputedStyle(rail).display === 'none') return;
+
+      const railTop = rail.getBoundingClientRect().top + window.scrollY;
+      let nextTop = 0;
+      notes.forEach(note => {
+        const source = document.getElementById(note.dataset.sourceId);
+        if (!source) return;
+        const desiredTop = source.getBoundingClientRect().top + window.scrollY - railTop - 2;
+        const top = Math.max(desiredTop, nextTop);
+        note.style.top = `${Math.round(top)}px`;
+        nextTop = top + note.offsetHeight + 14;
+      });
+    }
+    function scheduleCitationLayout() {
+      cancelAnimationFrame(citationFrame);
+      citationFrame = requestAnimationFrame(() => requestAnimationFrame(layoutCitationNotes));
+    }
+    function buildCitationRail(article, lang) {
+      const notes = document.getElementById('citation-notes');
+      notes.innerHTML = '';
+      const references = [...article.querySelectorAll('h1')].find(h => h.textContent.trim().toLowerCase() === 'references');
+      if (!references) return;
+
+      const referencesByUrl = new Map();
+      for (let node = references.nextElementSibling; node; node = node.nextElementSibling) {
+        if (node.matches('h1, h2, section')) break;
+        if (node.tagName !== 'P') continue;
+        node.querySelectorAll('a[href]').forEach(link => {
+          referencesByUrl.set(citationKey(link.href), node);
+        });
+      }
+
+      const citedLinks = [];
+      for (let node = article.firstElementChild; node && node !== references; node = node.nextElementSibling) {
+        if (node.classList.contains('comments-section')) continue;
+        citedLinks.push(...node.querySelectorAll('a[href]'));
+      }
+
+      let citationIndex = 0;
+      citedLinks.forEach(link => {
+        const reference = referencesByUrl.get(citationKey(link.href));
+        if (!reference) return;
+        citationIndex += 1;
+        const sourceId = `citation-source-${citationIndex}`;
+        link.id = sourceId;
+        link.dataset.citation = String(citationIndex);
+
+        const note = document.createElement('div');
+        note.className = 'citation-note';
+        note.dataset.sourceId = sourceId;
+        note.setAttribute('role', 'note');
+        note.setAttribute('aria-label', `${lang === 'zh' ? '引用' : 'Reference'} ${citationIndex}`);
+        note.innerHTML = `<span class="citation-number" aria-hidden="true">${citationIndex}</span><div class="citation-copy">${reference.innerHTML}</div>`;
+        note.querySelectorAll('a[href]').forEach(source => {
+          source.textContent = lang === 'zh' ? '查看来源 ↗' : 'Open source ↗';
+          source.target = '_blank';
+          source.rel = 'noreferrer';
+        });
+
+        const setActive = active => {
+          link.classList.toggle('citation-active', active);
+          note.classList.toggle('active', active);
+        };
+        link.addEventListener('mouseenter', () => setActive(true));
+        link.addEventListener('mouseleave', () => setActive(false));
+        link.addEventListener('focus', () => setActive(true));
+        link.addEventListener('blur', () => setActive(false));
+        note.addEventListener('mouseenter', () => setActive(true));
+        note.addEventListener('mouseleave', () => setActive(false));
+        notes.appendChild(note);
+      });
+
+      article.querySelectorAll('img').forEach(img => {
+        if (!img.complete) img.addEventListener('load', scheduleCitationLayout, { once: true });
+      });
+      scheduleCitationLayout();
+    }
+    function insertComments(article, lang) {
+      const references = [...article.querySelectorAll('h1')].find(h => h.textContent.trim().toLowerCase() === 'references');
+      if (!references) return;
+
+      const section = document.createElement('section');
+      section.className = 'comments-section';
+      section.setAttribute('aria-labelledby', 'comments-heading');
+      section.innerHTML = `
+        <h1 id="comments-heading">Discussion</h1>
+        <div class="comments-thread" id="comments-thread"></div>`;
+      references.before(section);
+
+      const thread = section.querySelector('.comments-thread');
+      if (location.protocol === 'file:') return;
+      if (!giscusConfig.repoId || !giscusConfig.categoryId) {
+        thread.innerHTML = `<p class="comments-setup">${lang === 'zh'
+          ? '评论区正在等待连接 GitHub Discussions。'
+          : 'The comment thread is waiting for its GitHub Discussions connection.'}</p>`;
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.dataset.repo = giscusConfig.repo;
+      script.dataset.repoId = giscusConfig.repoId;
+      script.dataset.category = giscusConfig.category;
+      script.dataset.categoryId = giscusConfig.categoryId;
+      script.dataset.mapping = 'specific';
+      script.dataset.term = giscusConfig.term;
+      script.dataset.strict = '1';
+      script.dataset.reactionsEnabled = '1';
+      script.dataset.emitMetadata = '0';
+      script.dataset.inputPosition = 'top';
+      script.dataset.theme = 'light';
+      script.dataset.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      script.dataset.loading = 'lazy';
+      script.crossOrigin = 'anonymous';
+      script.async = true;
+      thread.appendChild(script);
+    }
+    async function render(lang) {
+      const current = ++request;
+      const article = document.getElementById('article');
+      document.getElementById('toc-links').innerHTML = '';
+      document.getElementById('citation-notes').innerHTML = '';
+      article.innerHTML = `<p>${lang === 'zh' ? '正在载入文章…' : 'Loading article…'}</p>`;
+      try {
+        if (!window.OPD_CONTENT || !window.marked) throw new Error('content unavailable');
+        let md = window.OPD_CONTENT[lang];
+        md = md.replace(/<!--[^]*?-->/g, '').replace(/^!\[\]\(https:\/\/intranetproxy[^\n]+\)\s*$/gm, '');
+        const displayMath = [];
+        md = md.replace(/\$\$([\s\S]*?)\$\$/g, (_, tex) => {
+          const index = displayMath.push(tex.trim()) - 1;
+          return `<div class="math-block" data-math-index="${index}"></div>`;
+        });
+        if (current !== request) return;
+        article.innerHTML = marked.parse(md);
+        article.querySelectorAll('img').forEach(img => {
+          img.loading = 'lazy';
+          const imageParagraph = img.parentElement;
+          const figure = document.createElement('figure');
+          const caption = document.createElement('figcaption');
+          caption.textContent = img.alt;
+          if (imageParagraph?.tagName === 'P' && imageParagraph.children.length === 1) {
+            imageParagraph.replaceWith(figure);
+          } else {
+            img.parentNode.insertBefore(figure, img);
+          }
+          figure.appendChild(img);
+          if (img.alt) figure.appendChild(caption);
+        });
+        const figures = [...article.querySelectorAll('figure')];
+        figures[0]?.classList.add('lead-figure');
+        figures.forEach(figure => {
+          const note = figure.nextElementSibling;
+          const text = note?.textContent.trim() || '';
+          if (note?.tagName === 'P' && /^\([\s\S]*\)$/.test(text)) note.classList.add('figure-note');
+        });
+        if (!window.MathJax?.tex2svgPromise) throw new Error('math renderer unavailable');
+        await Promise.all([...article.querySelectorAll('.math-block')].map(async block => {
+          const tex = displayMath[Number(block.dataset.mathIndex)];
+          const rendered = await MathJax.tex2svgPromise(tex, { display: true });
+          block.replaceChildren(rendered);
+        }));
+        insertComments(article, lang);
+        const headings = [...article.querySelectorAll('h1, h2')];
+        headings.forEach((h, i) => { h.id = h.id || slug(h.textContent, i); });
+        if (window.MathJax?.typesetPromise) await MathJax.typesetPromise([article]);
+        if (current !== request) return;
+        buildToc(headings);
+        buildCitationRail(article, lang);
+      } catch (_) { article.innerHTML = `<p>${lang === 'zh' ? '文章载入失败，请刷新页面重试。' : 'The article could not be loaded. Please refresh the page.'}</p>`; }
+    }
+    window.addEventListener('scroll', scheduleTocUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      scheduleTocUpdate();
+      scheduleCitationLayout();
+    });
+    if (document.fonts?.ready) document.fonts.ready.then(scheduleCitationLayout);
+    document.addEventListener('languagechange', e => render(e.detail.lang));
+    render(window.siteLanguage.get());
+  </script>
+</body>
+</html>

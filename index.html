@@ -24,6 +24,19 @@
             color: white !important;
             font-weight: bold;
         }
+        .navbar-links {
+            margin-left: auto;
+            display: flex;
+            gap: 1.25rem;
+        }
+        .navbar-links a {
+            color: rgba(255,255,255,.82);
+            font-size: .95rem;
+        }
+        .navbar-links a:hover {
+            color: white;
+            text-decoration: none;
+        }
         .profile-section {
             display: flex;
             align-items: center;
@@ -82,7 +95,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">Huanxin Sheng</a>
+            <a class="navbar-brand" href="index.html">Huanxin Sheng</a>
+            <div class="navbar-links" aria-label="Primary navigation">
+                <a href="index.html">Homepage</a>
+                <a href="blog/index.html">Blog</a>
+            </div>
             </div>
     </nav>
 

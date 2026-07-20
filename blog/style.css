@@ -67,6 +67,16 @@ a { color: var(--blue); }
 .article code { font-size: .88em; background: #f0eee9; padding: .1em .35em; border-radius: 4px; }
 .math-block { margin: 1.8rem 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
 .math-block mjx-container { min-width: max-content; }
+.bibtex-section { margin-top: 4.6rem; padding: 2.4rem 0 1.8rem; border-top: 1px solid var(--line); font-family: var(--sans); }
+.bibtex-heading { display: flex; align-items: start; justify-content: space-between; gap: 24px; }
+.article .bibtex-heading h1 { margin: 0; font: 600 1.5rem/1.25 var(--serif); }
+.article .bibtex-heading p { margin: .45rem 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+.bibtex-copy { flex: none; min-height: 36px; padding: 7px 12px; border: 1px solid var(--navy); border-radius: 6px; background: var(--navy); color: white; cursor: pointer; font: 650 .8rem/1 var(--sans); transition: background .16s ease, border-color .16s ease; }
+.bibtex-copy:hover { background: var(--blue); border-color: var(--blue); }
+.bibtex-copy:focus-visible { outline: 3px solid #aebfff; outline-offset: 2px; }
+.bibtex-code { margin: 1.4rem 0 0; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: #f7f8fb; color: #263248; font: .82rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.article .bibtex-code code { padding: 0; background: transparent; font: inherit; white-space: pre; }
+.article p.bibtex-status { min-height: 1.4em; margin: .45rem 0 0; color: var(--muted); font: .76rem/1.4 var(--sans); }
 .comments-section { margin-top: 4.6rem; padding: 2.4rem 0 1.7rem; border-top: 1px solid var(--line); font-family: var(--sans); }
 .article .comments-section h1 { margin: 0 0 .55rem; font-family: var(--serif); }
 .comments-thread { min-height: 118px; margin-top: 1.5rem; }
@@ -128,6 +138,9 @@ a { color: var(--blue); }
   .wrap { padding: 0 18px; }
   .hero h1 { font-size: 2.8rem; }
   .article { font-size: 1rem; }
+  .bibtex-heading { align-items: stretch; flex-direction: column; gap: 16px; }
+  .bibtex-copy { align-self: start; }
+  .bibtex-code { padding: 15px 16px; font-size: .76rem; }
   .article figure { margin-left: auto; margin-right: auto; padding: 8px; }
   .article figure.lead-figure { width: 82%; max-width: 620px; }
 }

@@ -47,6 +47,14 @@
       categoryId: 'DIC_kwDOMH0GSs4DBPJB',
       term: 'opd-loss-design'
     });
+    const bibtexCitation = `@misc{sheng2026opd,
+  author = {Sheng, Huanxin and {Team}},
+  title = {On-Policy Distillation: Discussion of Loss Design},
+  year = {2026},
+  month = jul,
+  url = {https://brucesheng1202.github.io/blog/opd-loss-design.html},
+  note = {Blog post}
+}`;
     let tocHeadings = [];
     let tocFrame = 0;
     let citationFrame = 0;
@@ -182,6 +190,64 @@
       });
       scheduleCitationLayout();
     }
+    function insertBibtexCitation(article, lang) {
+      const references = [...article.querySelectorAll('h1')].find(h => h.textContent.trim().toLowerCase() === 'references');
+      if (!references) return;
+
+      const section = document.createElement('section');
+      section.className = 'bibtex-section';
+      section.setAttribute('aria-labelledby', 'bibtex-heading');
+      section.innerHTML = `
+        <div class="bibtex-heading">
+          <div>
+            <h1 id="bibtex-heading">${lang === 'zh' ? '引用本文' : 'Cite this article'}</h1>
+            <p>${lang === 'zh' ? '复制以下 BibTeX 条目用于论文或研究笔记。' : 'Copy this BibTeX entry for papers or research notes.'}</p>
+          </div>
+          <button class="bibtex-copy" type="button">${lang === 'zh' ? '复制 BibTeX' : 'Copy BibTeX'}</button>
+        </div>
+        <pre class="bibtex-code"><code></code></pre>
+        <p class="bibtex-status" aria-live="polite"></p>`;
+      references.before(section);
+
+      section.querySelector('code').textContent = bibtexCitation;
+      const button = section.querySelector('.bibtex-copy');
+      const status = section.querySelector('.bibtex-status');
+      const defaultLabel = button.textContent;
+      button.addEventListener('click', async () => {
+        let copied = false;
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
+          await navigator.clipboard.writeText(bibtexCitation);
+          copied = true;
+        } catch (_) {}
+        if (!copied) {
+          const textarea = document.createElement('textarea');
+          textarea.value = bibtexCitation;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            copied = document.execCommand('copy');
+          } finally {
+            textarea.remove();
+          }
+        }
+        if (!copied) {
+          status.textContent = lang === 'zh'
+            ? '自动复制失败，请手动选择上方条目。'
+            : 'Automatic copy failed. Please select the entry above.';
+          return;
+        }
+        button.textContent = lang === 'zh' ? '已复制' : 'Copied';
+        status.textContent = lang === 'zh' ? 'BibTeX 已复制到剪贴板。' : 'BibTeX copied to the clipboard.';
+        window.setTimeout(() => {
+          button.textContent = defaultLabel;
+          status.textContent = '';
+        }, 2400);
+      });
+    }
     function insertComments(article, lang) {
       const references = [...article.querySelectorAll('h1')].find(h => h.textContent.trim().toLowerCase() === 'references');
       if (!references) return;
@@ -266,6 +332,7 @@
           const rendered = await MathJax.tex2svgPromise(tex, { display: true });
           block.replaceChildren(rendered);
         }));
+        insertBibtexCitation(article, lang);
         insertComments(article, lang);
         const headings = [...article.querySelectorAll('h1, h2')];
         headings.forEach((h, i) => { h.id = h.id || slug(h.textContent, i); });

@@ -65,6 +65,11 @@ a { color: var(--blue); }
 .article p.figure-note { max-width: 88%; margin: -1.25rem auto 2.2rem; color: var(--muted); font: .82rem/1.55 var(--sans); text-align: center; }
 .article figure + p > em:only-child { display: none; }
 .article code { font-size: .88em; background: #f0eee9; padding: .1em .35em; border-radius: 4px; }
+.table-scroll { overflow-x: auto; margin: 1.4rem 0 1.8rem; }
+.table-scroll table { width: 100%; border-collapse: collapse; margin: 0; font: .82rem/1.45 var(--sans); }
+.table-scroll th, .table-scroll td { border-bottom: 1px solid var(--line); padding: 7px 10px; text-align: right; white-space: nowrap; }
+.table-scroll th:first-child, .table-scroll td:first-child { text-align: left; }
+.table-scroll th { color: var(--muted); font-weight: 650; }
 .math-block { margin: 1.8rem 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
 .math-block mjx-container { min-width: max-content; }
 .bibtex-section { margin-top: 4.6rem; padding: 2.4rem 0 1.8rem; border-top: 1px solid var(--line); font-family: var(--sans); }

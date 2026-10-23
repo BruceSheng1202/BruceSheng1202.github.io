@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 548" role="img">
+  <style>
+    text { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; fill: #172033; }
+    .h { font-size: 15px; font-weight: 700; }
+    .s { font-size: 13px; fill: #667085; }
+    .tiny { font-size: 12px; fill: #667085; }
+    .boxTitle { font-size: 16px; font-weight: 700; }
+    .boxSub { font-size: 13px; fill: #667085; }
+  </style>
+  <text class="h" x="36" y="28">Architecture</text>
+  <rect x="36" y="46" width="250" height="92" rx="12" fill="#00205b"/>
+  <text class="boxTitle" x="161" y="84" text-anchor="middle" fill="#fff">Prelude</text>
+  <text class="boxSub" x="161" y="108" text-anchor="middle" fill="#d9e2ff">2 layers, run once</text>
+  <rect x="390" y="46" width="300" height="92" rx="12" fill="#4169e1"/>
+  <text class="boxTitle" x="540" y="84" text-anchor="middle" fill="#fff">Loop block</text>
+  <text class="boxSub" x="540" y="108" text-anchor="middle" fill="#eef3ff">2 layers, repeated T times</text>
+  <rect x="794" y="46" width="250" height="92" rx="12" fill="#00205b"/>
+  <text class="boxTitle" x="919" y="84" text-anchor="middle" fill="#fff">Coda</text>
+  <text class="boxSub" x="919" y="108" text-anchor="middle" fill="#d9e2ff">2 layers, run once</text>
+  <path d="M286 92 H360" stroke="#98a2b3" stroke-width="2" fill="none"/>
+  <path d="M690 92 H764" stroke="#98a2b3" stroke-width="2" fill="none"/>
+  <path d="M354 92 l-8 -5 v10 z" fill="#98a2b3"/>
+  <path d="M758 92 l-8 -5 v10 z" fill="#98a2b3"/>
+  <path d="M161 138 v28 h379 v-22" stroke="#4169e1" stroke-width="1.6" fill="none"/>
+  <path d="M540 144 l-5 8 h10 z" fill="#4169e1"/>
+  <text class="tiny" x="250" y="182">every loop reads the prelude output again</text>
+
+  <text class="h" x="36" y="230">Three ways to spend the loops</text>
+  <text class="s" x="36" y="268">Original</text>
+  <g fill="#e7e2d8" stroke="#d5d0c6">
+    <rect x="150" y="248" width="46" height="28" rx="5"/>
+    <rect x="202" y="248" width="46" height="28" rx="5"/>
+    <rect x="254" y="248" width="46" height="28" rx="5"/>
+    <rect x="306" y="248" width="46" height="28" rx="5"/>
+    <rect x="358" y="248" width="46" height="28" rx="5"/>
+  </g>
+  <g fill="#4169e1">
+    <rect x="410" y="248" width="46" height="28" rx="5"/>
+    <rect x="462" y="248" width="46" height="28" rx="5"/>
+    <rect x="514" y="248" width="46" height="28" rx="5"/>
+    <rect x="566" y="248" width="46" height="28" rx="5"/>
+  </g>
+  <text class="tiny" x="618" y="267">example: T = 9</text>
+  <text class="tiny" x="150" y="298">T ~ Poisson(mean 8), capped in practice by the run. Gradient on the last 4 loops only.</text>
+
+  <text class="s" x="36" y="348">Fixed 4</text>
+  <g fill="#4169e1">
+    <rect x="150" y="328" width="46" height="28" rx="5"/>
+    <rect x="202" y="328" width="46" height="28" rx="5"/>
+    <rect x="254" y="328" width="46" height="28" rx="5"/>
+    <rect x="306" y="328" width="46" height="28" rx="5"/>
+  </g>
+  <text class="tiny" x="150" y="378">T fixed at 4. Every loop has a gradient, and every loop sees the full context.</text>
+
+  <text class="s" x="36" y="428">Lean</text>
+  <rect x="150" y="408" width="46" height="28" rx="5" fill="#4169e1"/>
+  <g fill="#b45309">
+    <rect x="202" y="408" width="46" height="28" rx="5"/>
+    <rect x="254" y="408" width="46" height="28" rx="5"/>
+    <rect x="306" y="408" width="46" height="28" rx="5"/>
+  </g>
+  <text class="tiny" x="150" y="458">T fixed at 4, gradient on every loop. Loop 1 sees the full context; loops 2-4 see the last 64 tokens.</text>
+
+  <g transform="translate(36,492)">
+    <rect width="14" height="14" rx="3" fill="#e7e2d8" stroke="#d5d0c6"/>
+    <text class="tiny" x="20" y="12">forward only</text>
+    <rect x="130" width="14" height="14" rx="3" fill="#4169e1"/>
+    <text class="tiny" x="150" y="12">gradient, full attention</text>
+    <rect x="330" width="14" height="14" rx="3" fill="#b45309"/>
+    <text class="tiny" x="350" y="12">gradient, last 64 tokens</text>
+  </g>
+</svg>

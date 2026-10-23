@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 370">
+<style>
+  text { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; fill: #172033; }
+  .axis { font-size: 13px; fill: #667085; }
+  .title { font-size: 15px; font-weight: 700; }
+  .legend { font-size: 13px; fill: #667085; }
+</style>
+<text class="title" x="78" y="24">Loss against the number of inference loops</text>
+<line x1='78' y1='286.6' x2='900' y2='286.6' stroke='#e8e5df'/><text class='axis' x='68' y='290.6' text-anchor='end'>3.2</text><line x1='78' y1='232.99' x2='900' y2='232.99' stroke='#e8e5df'/><text class='axis' x='68' y='237' text-anchor='end'>3.4</text><line x1='78' y1='179.38' x2='900' y2='179.38' stroke='#e8e5df'/><text class='axis' x='68' y='183.4' text-anchor='end'>3.6</text><line x1='78' y1='125.77' x2='900' y2='125.77' stroke='#e8e5df'/><text class='axis' x='68' y='129.8' text-anchor='end'>3.8</text><line x1='78' y1='72.16' x2='900' y2='72.16' stroke='#e8e5df'/><text class='axis' x='68' y='76.2' text-anchor='end'>4</text>
+<text class='axis' x='78' y='322' text-anchor='middle'>1</text><text class='axis' x='242.4' y='322' text-anchor='middle'>2</text><text class='axis' x='338.57' y='322' text-anchor='middle'>3</text><text class='axis' x='406.8' y='322' text-anchor='middle'>4</text><text class='axis' x='502.97' y='322' text-anchor='middle'>6</text><text class='axis' x='571.2' y='322' text-anchor='middle'>8</text><text class='axis' x='667.37' y='322' text-anchor='middle'>12</text><text class='axis' x='735.6' y='322' text-anchor='middle'>16</text><text class='axis' x='831.77' y='322' text-anchor='middle'>24</text><text class='axis' x='900' y='322' text-anchor='middle'>32</text>
+<polyline fill='none' stroke='#00205b' stroke-width='2.4' points='78,206.05 242.4,249.74 338.57,264.32 406.8,270.09 502.97,273.68 571.2,274.35 667.37,274.48 735.6,274.46 831.77,274.4 900,274.4'/>
+<polyline fill='none' stroke='#b45309' stroke-width='2.4' points='78,60.4 242.4,168.42 338.57,224.28 406.8,275.82 502.97,222.8 571.2,257.49 667.37,248.72 735.6,246.28 831.77,245.59 900,245.59'/>
+<circle cx='406.8' cy='275.82' r='4.5' fill='#b45309'/>
+<circle cx='667.37' cy='274.48' r='4.5' fill='#00205b'/>
+<rect x='620' y='48' width='12' height='12' rx='2' fill='#00205b'/><text class='legend' x='640' y='59'>Original</text>
+<rect x='740' y='48' width='12' height='12' rx='2' fill='#b45309'/><text class='legend' x='760' y='59'>Lean</text>
+<text class='axis' x='78' y='350'>144M parameters, 1B tokens, mean of two seeds. Log-scaled loop axis. Lower is better.</text>
+</svg>

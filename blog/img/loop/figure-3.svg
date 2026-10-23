@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 350">
+<style>
+  text { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; fill: #172033; }
+  .axis { font-size: 13px; fill: #667085; }
+  .title { font-size: 15px; font-weight: 700; }
+  .legend { font-size: 13px; fill: #667085; }
+</style>
+<text class="title" x="250" y="28">Relative change in the hidden state</text>
+<line x1='250' y1='250' x2='940' y2='250' stroke='#e8e5df'/><text class='axis' x='240' y='254' text-anchor='end'>0</text><line x1='250' y1='199.5' x2='940' y2='199.5' stroke='#e8e5df'/><text class='axis' x='240' y='203.5' text-anchor='end'>0.2</text><line x1='250' y1='149' x2='940' y2='149' stroke='#e8e5df'/><text class='axis' x='240' y='153' text-anchor='end'>0.4</text><line x1='250' y1='98.5' x2='940' y2='98.5' stroke='#e8e5df'/><text class='axis' x='240' y='102.5' text-anchor='end'>0.6</text><line x1='250' y1='48' x2='940' y2='48' stroke='#e8e5df'/><text class='axis' x='240' y='52' text-anchor='end'>0.8</text>
+<rect x='300' y='156.58' width='30' height='93.42' rx='3' fill='#00205b'/><text class='axis' x='315' y='150.58' text-anchor='middle'>0.37</text><rect x='338' y='93.45' width='30' height='156.55' rx='3' fill='#b45309'/><text class='axis' x='353' y='87.45' text-anchor='middle'>0.62</text><rect x='376' y='73.25' width='30' height='176.75' rx='3' fill='#4169e1'/><text class='axis' x='391' y='67.25' text-anchor='middle'>0.7</text><rect x='510' y='204.55' width='30' height='45.45' rx='3' fill='#00205b'/><text class='axis' x='525' y='198.55' text-anchor='middle'>0.18</text><rect x='548' y='108.6' width='30' height='141.4' rx='3' fill='#b45309'/><text class='axis' x='563' y='102.6' text-anchor='middle'>0.56</text><rect x='586' y='113.65' width='30' height='136.35' rx='3' fill='#4169e1'/><text class='axis' x='601' y='107.65' text-anchor='middle'>0.54</text><rect x='720' y='227.28' width='30' height='22.72' rx='3' fill='#00205b'/><text class='axis' x='735' y='221.28' text-anchor='middle'>0.09</text><rect x='758' y='90.93' width='30' height='159.07' rx='3' fill='#b45309'/><text class='axis' x='773' y='84.93' text-anchor='middle'>0.63</text><rect x='796' y='133.85' width='30' height='116.15' rx='3' fill='#4169e1'/><text class='axis' x='811' y='127.85' text-anchor='middle'>0.46</text>
+<text class='axis' x='354' y='274' text-anchor='middle'>Loop 2</text><text class='axis' x='564' y='274' text-anchor='middle'>Loop 3</text><text class='axis' x='774' y='274' text-anchor='middle'>Loop 4</text>
+<text class='axis' x='20' y='150' transform='rotate(-90 20 150)'>change / previous state</text>
+<rect x='250' y='306' width='12' height='12' rx='2' fill='#00205b'/><text class='legend' x='268' y='317'>Original, 2B tokens</text>
+<rect x='460' y='306' width='12' height='12' rx='2' fill='#b45309'/><text class='legend' x='478' y='317'>Lean, 2B tokens</text>
+<rect x='650' y='306' width='12' height='12' rx='2' fill='#4169e1'/><text class='legend' x='668' y='317'>Fixed 4, full attention, 1B</text>
+</svg>

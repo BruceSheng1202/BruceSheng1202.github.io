@@ -1,9 +1,8 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<header class="site-nav">
-  <a class="brand" href="../index.html">Huanxin Sheng</a>
-  <nav aria-label="Primary navigation">
-    <a href="../index.html">Homepage</a>
-    <a href="index.html" aria-current="page">Blog</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="../index.html">Huanxin Sheng</a>
+    <div class="navlinks"><a href="../index.html">Homepage</a><a href="index.html" aria-current="page">Blog</a></div>
   </nav>
 </header>
 <title>循环模型的算力账</title>
@@ -13,60 +12,47 @@
 <style>
 /* Layout: one centered reading column (about 40 CJK characters per line); figures share the column and scroll sideways only on narrow phones. */
 :root {
-  --bg: #fcfcfb;
-  --panel: #f2f2ef;
-  --ink: #15161a;
-  --ink-2: #464950;
-  --muted: #6b6e75;
-  --rule: #e1e0db;
-  --grid: #e9e8e3;
-  --axis: #c3c2b7;
-  --accent: #1c5cab;
+  --bg: #ffffff;
+  --panel: #f7f8fb;
+  --ink: #172033;
+  --ink-2: #4d576b;
+  --muted: #667085;
+  --rule: #e8e5df;
+  --grid: #eef0f4;
+  --axis: #c8cfdb;
+  --accent: #4169e1;
+  --navy: #00205b;
   --s-new: #2a78d6;
   --s-old: #eb6834;
   --s-gpt: #1baf7a;
   --s-cut: #9a9ca2;
-  --wash: rgba(42, 120, 214, 0.16);
-  --noise: rgba(21, 22, 26, 0.05);
+  --wash: rgba(65, 105, 225, 0.12);
+  --noise: rgba(23, 32, 51, 0.05);
   --tip-bg: #ffffff;
-  --shadow: 0 8px 28px rgba(17, 18, 20, 0.12);
-  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
-  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1a1a19; --panel: #242423; --ink: #f2f2ee; --ink-2: #c6c5bc; --muted: #9a988f; --rule: #34342f;
-    --grid: #2c2c2a; --axis: #4a4944; --accent: #86b6ef; --s-new: #3987e5; --s-old: #d95926; --s-gpt: #199e70;
-    --s-cut: #75777d; --wash: rgba(57, 135, 229, 0.24); --noise: rgba(255, 255, 255, 0.06); --tip-bg: #2a2a28;
-    --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #1a1a19; --panel: #242423; --ink: #f2f2ee; --ink-2: #c6c5bc; --muted: #9a988f; --rule: #34342f;
-  --grid: #2c2c2a; --axis: #4a4944; --accent: #86b6ef; --s-new: #3987e5; --s-old: #d95926; --s-gpt: #199e70;
-  --s-cut: #75777d; --wash: rgba(57, 135, 229, 0.24); --noise: rgba(255, 255, 255, 0.06); --tip-bg: #2a2a28;
-  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-  color-scheme: dark;
+  --shadow: 0 8px 28px rgba(23, 32, 51, 0.12);
+  --font-display: Georgia, "Times New Roman", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --serif: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", "SimSun", serif;
+  color-scheme: light;
 }
 
-body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 18px; line-height: 1.9; }
-.page { max-width: 760px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 88px; }
-.eyebrow { font-size: 14px; letter-spacing: 0.06em; color: var(--muted); margin: 0; }
-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 6vw, 46px); line-height: 1.25; margin: 10px 0 18px; text-wrap: balance; }
-.dek { font-size: 19px; line-height: 1.85; color: var(--ink-2); margin: 0 0 12px; }
-.meta { font-size: 15px; color: var(--muted); margin: 0; }
-.summary { background: var(--panel); border-radius: 10px; padding: 22px 26px 22px; margin: 32px 0 0; }
-.summary h2 { font-size: 20px; margin: 0 0 8px; }
+body { background: var(--bg); color: var(--ink); font-family: var(--serif); font-size: 17.5px; line-height: 1.74; }
+.page { max-width: 760px; margin: 0 auto; padding-inline: 24px; padding-block: 56px 40px; }
+.eyebrow { font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5vw, 42px); line-height: 1.2; letter-spacing: -0.035em; margin: 12px 0 16px; text-wrap: balance; }
+.dek { font-size: 1.06rem; line-height: 1.68; color: var(--muted); margin: 0 0 14px; }
+.meta { font-family: var(--font-body); font-size: 0.83rem; color: var(--muted); margin: 0; }
+.summary { background: #fff; border: 1px solid var(--rule); border-radius: 16px; padding: 22px 26px; margin: 28px 0 0; }
+.summary h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.3; margin: 0 0 10px; }
 .summary p { margin: 0 0 12px; }
 .summary p:last-child { margin-bottom: 0; }
-.howto { font-size: 16px; line-height: 1.8; color: var(--ink-2); border-top: 1px solid var(--rule); margin: 24px 0 0; padding-top: 14px; }
+.howto { font-family: var(--font-body); font-size: 0.92rem; line-height: 1.65; color: var(--muted); border-left: 3px solid var(--accent); margin: 22px 0 0; padding: 2px 0 2px 18px; }
 .howto b { color: var(--ink); }
-.toc { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 15px; margin: 14px 0 0; }
-.toc a { color: var(--ink-2); text-decoration: none; }
-.toc a:hover { color: var(--accent); text-decoration: underline; }
-h2 { font-family: var(--font-display); font-weight: 700; font-size: 27px; line-height: 1.4; margin: 64px 0 16px; text-wrap: balance; }
-h3 { font-size: 19px; font-weight: 700; line-height: 1.5; margin: 32px 0 8px; text-wrap: balance; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--font-body); font-size: 0.9rem; margin: 18px 0 0; }
+.toc a { color: var(--muted); text-decoration: none; }
+.toc a:hover { color: var(--accent); text-decoration: none; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.7rem; line-height: 1.35; letter-spacing: -0.02em; margin: 2.6em 0 0.7em; text-wrap: balance; scroll-margin-top: 90px; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.4; margin: 1.8em 0 0.45em; text-wrap: balance; scroll-margin-top: 90px; }
 p { margin: 0 0 18px; }
 a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
 a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
@@ -74,9 +60,9 @@ ul.refs { margin: 0 0 18px; padding-left: 1.2em; }
 ul.refs li { margin: 0 0 12px; }
 .note { font-size: 16px; color: var(--ink-2); }
 
-figure { margin: 30px 0 38px; }
-.fig-title { font-size: 16px; font-weight: 700; color: var(--ink); margin: 0 0 4px; }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 14px; color: var(--ink-2); margin: 0 0 4px; }
+figure { margin: 2.2rem 0; padding: 12px 12px 8px; border: 1px solid var(--rule); border-radius: 14px; background: #fff; }
+.fig-title { font-family: var(--font-body); font-size: 0.95rem; font-weight: 650; color: var(--ink); margin: 0 0 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 20px; font-family: var(--font-body); font-size: 0.82rem; color: var(--ink-2); margin: 0 0 4px; }
 .key { display: inline-flex; align-items: center; gap: 8px; }
 .key i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; }
 .key i.sw { width: 12px; height: 12px; border-radius: 3px; }
@@ -87,21 +73,24 @@ figure { margin: 30px 0 38px; }
 .chart { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .chart + .fig-title { margin-top: 22px; }
 .chart svg { display: block; width: 100%; min-width: 560px; height: auto; overflow: visible; }
-figcaption { font-size: 15px; line-height: 1.75; color: var(--ink-2); margin-top: 10px; }
+figcaption { font-family: var(--font-body); font-size: 0.82rem; line-height: 1.55; color: var(--muted); margin-top: 10px; }
 figcaption b { color: var(--ink); }
-details.data { margin-top: 8px; font-size: 15px; }
+details.data { margin-top: 8px; font-family: var(--font-body); font-size: 0.9rem; }
 details.data summary { cursor: pointer; color: var(--accent); width: fit-content; }
 .tbl { overflow-x: auto; margin: 10px 0 14px; }
-table { border-collapse: collapse; width: 100%; font-size: 14.5px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+table { border-collapse: collapse; width: 100%; font-family: var(--font-body); font-size: 0.82rem; line-height: 1.45; font-variant-numeric: tabular-nums; }
 th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
 th { font-weight: 500; color: var(--ink-2); font-size: 13.5px; vertical-align: bottom; }
-.tbl-note { font-size: 14px; color: var(--muted); margin: 0 0 12px; }
+.tbl-note { font-family: var(--font-body); font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; }
 
-dl.setup { display: grid; grid-template-columns: 6.5em 1fr; gap: 8px 18px; font-size: 16px; line-height: 1.75; margin: 0 0 18px; }
+dl.setup { display: grid; grid-template-columns: 6.5em 1fr; gap: 8px 18px; font-family: var(--font-body); font-size: 0.95rem; line-height: 1.7; margin: 0 0 18px; }
 dl.setup dt { color: var(--muted); }
 dl.setup dd { margin: 0; min-width: 0; }
-footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--muted); }
+footer.colophon { margin-top: 56px; padding: 28px 0 8px; border-top: 1px solid var(--rule); font-family: var(--font-body); font-size: 0.86rem; color: var(--muted); }
+footer.colophon p { margin: 0 0 12px; }
+footer.colophon a { color: var(--accent); text-decoration: none; }
+footer.colophon a:hover { text-decoration: underline; }
 @media (max-width: 520px) {
   body { font-size: 17px; }
   .summary { padding: 18px 18px; }
@@ -151,11 +140,12 @@ svg text { font-family: var(--font-body); }
   border-radius: 8px; padding: 8px 11px; font-size: 13.5px; line-height: 1.6; box-shadow: var(--shadow); pointer-events: none;
   font-variant-numeric: tabular-nums; }
 #tip .tip-h { font-weight: 700; margin-bottom: 2px; }
-.site-nav { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 28px; height: 68px; padding: 0 24px; background: #00205b; color: #fff; font-family: var(--font-body); }
-.site-nav .brand { color: #fff; font-weight: 700; text-decoration: none; letter-spacing: -0.02em; }
-.site-nav nav { margin-left: auto; display: flex; gap: 22px; }
-.site-nav nav a { color: rgba(255,255,255,.82); text-decoration: none; font-size: 15px; }
-.site-nav nav a:hover, .site-nav nav a[aria-current="page"] { color: #fff; }</style>
+.topbar { position: sticky; top: 0; z-index: 30; background: var(--navy); }
+.nav { max-width: 1120px; height: 68px; margin: auto; padding: 0 24px; display: flex; align-items: center; gap: 28px; font-family: var(--font-body); }
+.brand { color: #fff; text-decoration: none; font-weight: 760; letter-spacing: -0.02em; }
+.navlinks { display: flex; gap: 22px; margin-left: auto; align-items: center; }
+.navlinks a { color: rgba(255,255,255,.82); text-decoration: none; font-size: 0.94rem; }
+.navlinks a:hover, .navlinks a[aria-current="page"] { color: #fff; font-weight: 650; text-decoration: none; }</style>
 
 <div class="page">
 <header>
@@ -442,7 +432,10 @@ svg text { font-family: var(--font-body); }
   <dt>硬件</dt><dd>一张 RTX 5090 笔记本 GPU（24 GB），bf16，torch.compile。</dd>
 </dl>
 
-<footer>数字取自每次训练结束时的评测记录，测速和逐轮诊断的原始输出记在项目的研究日志里。</footer>
+<footer class="colophon">
+  <p>数字取自每次训练结束时的评测记录，测速和逐轮诊断的原始输出记在项目的研究日志里。</p>
+  <p><a href="index.html">← 返回全部文章</a></p>
+</footer>
 </div>
 <div id="tip" role="tooltip" hidden></div>
 

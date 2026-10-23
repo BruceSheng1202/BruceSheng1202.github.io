@@ -1,12 +1,12 @@
 # Huanxin Sheng — Personal Website
 
-<p align="center">
-  <img src="img/profile_2_big.jpg" alt="Huanxin Sheng" width="360" />
-</p>
-
 Welcome! 👋 This repo hosts my academic homepage and research blog.
 
 **Live site:** https://brucesheng1202.github.io/index.html
+
+<p align="center">
+  <img src="img/profile_2_big.jpg" alt="Huanxin Sheng" width="360" />
+</p>
 
 ## News
 

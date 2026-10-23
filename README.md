@@ -18,9 +18,9 @@ Welcome! 👋 This repo hosts my academic homepage and research blog.
 
 ## Latest Blog
 
-- **Oct 2026** — [Accounting for Compute in a Looped Model](https://brucesheng1202.github.io/blog/loop-compute-ledger.html?lang=en)
+- **Oct 2026** — [Accounting for Compute in a Looped Model](https://brucesheng1202.github.io/blog/loop-compute-ledger/?lang=en)
   The Parcae recipe averages eight loops, but the first four already collect 94% of the gain. I trained 60+ small models on a single RTX 5090 to see how much of that compute is actually necessary.
-- **Jul 2026** — [On-Policy Distillation: Discussion of Loss Design](https://brucesheng1202.github.io/blog/opd-loss-design.html?lang=en)
+- **Jul 2026** — [On-Policy Distillation: Discussion of Loss Design](https://brucesheng1202.github.io/blog/opd-loss-design/?lang=en)
   A practical guide to choosing an OPD objective: reverse KL, better estimators, Top-K truncation, and why representation distillation still struggles on-policy.
 
 ---

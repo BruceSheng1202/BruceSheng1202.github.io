@@ -193,7 +193,7 @@
     'svg-sq': 'one square = one loop'
   };
 
-  var bib = '@misc{sheng2026loop,\n  author = {Sheng, Huanxin},\n  title = {Accounting for Compute in a Looped Model},\n  year = {2026},\n  month = oct,\n  url = {https://brucesheng1202.github.io/blog/loop-compute-ledger.html},\n  note = {Blog post}\n}';
+  var bib = '@misc{sheng2026loop,\n  author = {Sheng, Huanxin},\n  title = {Accounting for Compute in a Looped Model},\n  year = {2026},\n  month = oct,\n  url = {https://brucesheng1202.github.io/blog/loop-compute-ledger/},\n  note = {Blog post}\n}';
 
   var lang = new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en';
   var frame = 0;

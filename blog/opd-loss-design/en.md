@@ -66,7 +66,7 @@ Leaving these engineering complications aside, there are three cleaner options:
 # 2 Reverse KL vs Other Loss?
 Reverse KL is certainly not the only choice, but it may still be the best one available. Foundational works such as MiniLLM ([Gu et al., 2024](https://arxiv.org/abs/2306.08543)) and GKD ([Agarwal et al., 2024](https://arxiv.org/abs/2306.13649)) had already explored forward KL, JS divergence, and other options. Combining the two KL directions, taking their midpoint, or extending them to more general f-divergences (Hellinger distance ([Xie et al., 2025](https://arxiv.org/abs/2510.11615)) and $ \alpha $-$ \beta $ divergence ([Wang et al., 2025](https://arxiv.org/abs/2505.04560))) is nothing new either. The key question is: What are the benefits and drawbacks?
 
-![](img/opd/figure-000.png)
+![](img/figure-000.png)
 
 (This figure comes from MiniLLM; many related articles contain similar illustrations.)
 
@@ -74,20 +74,20 @@ Across conventional knowledge distillation, from the neural-network era and the 
 
 Despite drawbacks such as overconfidence, strong benchmark performance has kept RKL the first choice for OPD. In fact, RKL may have other advantages. The following figure extends the toy example from Adaptive KL ([Wu et al., 2025](https://arxiv.org/pdf/2404.02657)) to larger vocabularies. Although FKL and RKL may appear to “arrive at the same destination by different routes” during optimization, in the large output spaces of modern LLMs, RKL is clearly better at bringing the student's probabilities toward the teacher's. Theoretically, [Luong et al. (2026)](https://arxiv.org/pdf/2604.00223v1) show that RKL reduces optimization complexity, especially when the student has less capacity than the teacher.
 
-![](img/opd/figure-001.png)
+![](img/figure-001.png)
 
 (As the output space grows, distillation requires more epochs to converge, and FKL and RKL approach the target in two fundamentally different ways.)
 
 # 3 Better Estimators?
 RKL may still be the best loss for OPD. Are there better estimators that make distillation more stable? Yes, there are:
 
-![](img/opd/figure-002.png)
+![](img/figure-002.png)
 
 EMA-PG ([Zhang & Ba, 2026](https://arxiv.org/pdf/2602.04417)) summarizes the K1-K3 estimators for RKL discussed by [Schulman (2020)](http://joschu.net/blog/kl-approx.html) and the K3++ estimator from DeepSeek-V3.2 ([DeepSeek-AI, 2025](https://arxiv.org/pdf/2512.02556)), analyzes their bias and variance in both estimated values and gradients, and proposes the K4 and K5 estimators. Through computational corrections, sampled RKL can be made unbiased in both its loss value and gradient. In OPD research, Skill-SD ([Wang et al., 2026](https://arxiv.org/pdf/2604.10674)) also discusses the use of K3++ in Appendix D.2 as an importance-weighted version of the K3 estimator. At present, we have not seen these better estimators used in other OPD studies (knowledge current to June 2026).
 
 The so-called TopkReverseKL and TopkForwardKL in the figure above are combinations of sampled KL and Top-K-truncated KL. This method corrects the theoretical bias of Top-K-truncated KL while also reducing the high variance of sampled KL, suggesting that it is better when truncating at a small k.
 
-![](img/opd/figure-003.png)
+![](img/figure-003.png)
 
 [Fu et al. (2026)](https://arxiv.org/pdf/2603.25562) compare truncated Top-K KL with EMA-PG-style tail correction for OPD in their appendix. As the figure above shows, the performance gap between them depends strongly on the value of k and the sharpness of the distribution. Inspection of their reproduction code also shows that it does not use the correct K4 estimator.
 
@@ -154,11 +154,11 @@ We use two pairs of 1.5B models from JustRL ([He et al., 2025](https://arxiv.org
 
 First, in terms of training dynamics, pure CKA progresses substantially more slowly than pure KL OPD. The sampled RKL here uses the K4 estimator.
 
-![](img/opd/figure-004.png)
+![](img/figure-004.png)
 
 In the final evaluation, pure on-policy CKA struggles to compete with KL OPD and also underperforms off-policy CKA. It is worth noting, however, that with K4 RKL and the teacher's Top-K distillation, the trained student surpasses the teacher to some extent.
 
-![](img/opd/figure-005.png)
+![](img/figure-005.png)
 
 In theory, CKA can be an effective supplement to KL OPD. In our experimental analysis, however, their gradient directions in the final hidden layer are almost orthogonal. After trying multiple weighting schemes, the resulting training performance usually falls somewhere between the two. In the On-Policy CKA + sampled K4 or Top50 experiments in the table above, performance improves only slightly over pure KL OPD in some cases and declines in others.
 
@@ -171,41 +171,41 @@ We also ran K1/K5 experiments and the EMA-PG-style tail correction, namely the T
 ## 5.2 Clinical Reasoning
 On the medical diagnostic reasoning problems that medical-algorithm researchers care about, pure CKA holds its own. The combined losses also perform about as well as K4 and Top-50; all of them successfully distill the capabilities. One caveat is that, for cost reasons, our HealthBench grader is gpt-oss-120b, with MF1=0.66. This evaluation model falls some distance short of the official default, GPT-4.1 ([Arora et al., 2025](https://arxiv.org/abs/2505.08775)), and is a relatively weak and somewhat unreliable grader.
 
-![](img/opd/figure-006.png)
+![](img/figure-006.png)
 
 ## 5.3 Large-to-Small Distillation: Math Reasoning
 One major motivation for using CKA as a loss is its independence from hidden-state dimensionality, which allows a teacher and student of different sizes to be distilled as long as they share the same vocabulary. In the experiment below, OpenMath-Nemotron-7B teaches a 1.5B student. The combined CKA and K4 loss does perform better than either loss alone, but it transfers only a small portion of the teacher's capabilities.
 
-![](img/opd/figure-007.png)
+![](img/figure-007.png)
 
 In fact, strong-to-weak distillation is not particularly difficult in OPD; the truly difficult problem is large-to-small distillation. Even with strong baselines such as G-OPD ([Yang et al., 2026](https://arxiv.org/abs/2602.12125)), large-to-small distillation often fails and may even cause capability regression. Even when a strengthened Qwen3-4B teacher distills a Qwen3-1.7B student, the student often cannot learn all of the teacher's performance, perhaps because of their size and architectural differences. We also do not yet have a conclusion about the performance differences produced by choosing base, instruct, or post-trained models as the student and teacher. A plausible conclusion is that distillation becomes harder as the models differ more in size and architecture. Because of those differences, a capability gap between student and teacher may always remain, no matter how the distillation is performed.
 
 For example, in the figure below, a 14B teacher distills a 1.5B student. Because of the large size and architectural gap, the CKA loss decreases but hidden-norm alignment fails, training becomes abnormal, and the model's reasoning capability ultimately regresses substantially.
 
-![](img/opd/figure-008.png)
+![](img/figure-008.png)
 
 ## 5.4 Analysis of CKA Training Dynamics
 Continuing the analysis of the training dynamics above, the motivation for CKA representation distillation is to have the student and teacher declare “Our wills align!”—rather than remain “outwardly alike but inwardly apart.” The latter has a precise theoretical meaning here: pure KL distillation aligns the student's output probability mass with the teacher's, but does not align their logits or hidden states. A constant-related error term therefore remains in the hidden states.
 
 Our experimental analysis confirms this. In strong-to-weak experiments using CKA, the norms of the two models' final-layer hidden states align and converge quickly. With pure KL, a somewhat larger gap persists throughout training.
 
-![](img/opd/figure-009.png)
+![](img/figure-009.png)
 
-![](img/opd/figure-010.png)
+![](img/figure-010.png)
 
 In the method-design section, we noted that CKA implementations suffer from sample autocorrelation and token noise. These problems ultimately appear as loss spikes during training. Inflated CKA values and spikes are not new in conventional representation distillation; the main remedy is to filter out certain samples, which is one possible way to improve CKA. Our attempts also revealed several interesting phenomena.
 
 First, the higher the sampling temperature, the larger the loss oscillations. This is intuitive: at a higher sampling temperature, the student is more likely to generate absurd tokens, increasing the proportion of noise in the teacher's supervision. Once a harmful sample appears, the loss at that step surges.
 
-![](img/opd/figure-011.png)
+![](img/figure-011.png)
 
 In practice, loss spikes can sometimes be severe: CKA loss may increase by tens or even hundreds of times within a single step, only to return to normal at the next step.
 
-![](img/opd/figure-012.png)
+![](img/figure-012.png)
 
 Analysis of the anomalous tokens shows that those causing spikes are mostly punctuation marks and discourse-connective words, with almost no relevance to reasoning. In engineering practice, however, data parallelism and the number of samples can reduce the autocorrelation problem and substantially alleviate loss spikes. Taking a per-token first difference of hidden states also changes the objective fundamentally and almost entirely removes the spikes, while producing almost no difference in distillation performance.
 
-![](img/opd/figure-013.png)
+![](img/figure-013.png)
 
 Beyond first differences, CKA has several alternative calculation forms; for example, its similarity may take a square-root form or a squared form. In practice, they produce nearly identical results.
 

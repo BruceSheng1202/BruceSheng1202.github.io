@@ -66,8 +66,11 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 
 .meta { font-family: var(--font-body); font-size: 0.83rem; color: var(--muted); margin: 0; }
 .summary { background: #fff; border: 1px solid var(--rule); border-radius: 16px; padding: 22px 26px; margin: 28px 0 0; }
 .summary h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.3; margin: 0 0 10px; }
-.summary p { margin: 0 0 12px; }
-.summary p:last-child { margin-bottom: 0; }
+.summary ol { list-style: none; margin: 0; padding: 0; counter-reset: take; }
+.summary li { position: relative; counter-increment: take; margin: 0 0 12px; padding-left: 2.1em; }
+.summary li:last-child { margin-bottom: 0; }
+.summary li::before { content: counter(take) ". "; position: absolute; left: 0; color: var(--navy); font-family: var(--font-body); font-weight: 650; }
+html[lang="zh-CN"] .summary li::before { content: counter(take, simp-chinese-informal) "、"; }
 .howto { font-family: var(--font-body); font-size: 0.92rem; line-height: 1.65; color: var(--muted); border-left: 3px solid var(--accent); margin: 22px 0 0; padding: 2px 0 2px 18px; }
 .howto b { color: var(--ink); }
 h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.7rem; line-height: 1.35; letter-spacing: -0.02em; margin: 2.6em 0 0.7em; text-wrap: balance; scroll-margin-top: 90px; }
@@ -178,6 +181,10 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 .cite-copy { flex: none; min-height: 36px; padding: 7px 12px; border: 1px solid var(--navy); border-radius: 6px; background: var(--navy); color: #fff; cursor: pointer; font: 650 .8rem/1 var(--font-body); }
 .cite-copy:hover { background: var(--accent); border-color: var(--accent); }
 .cite-code { margin: 1rem 0 0; padding: 16px 18px; overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: #f7f8fb; color: #263248; font: .8rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.comments { margin-top: 3.2rem; padding-top: 1.6rem; border-top: 1px solid var(--rule); font-family: var(--font-body); }
+.comments h2 { margin-top: 0; }
+.comments-thread { min-height: 118px; margin-top: 1.1rem; }
+.comments-thread .giscus, .comments-thread .giscus-frame { width: 100%; }
 .cite-code code { font: inherit; white-space: pre; }
 .cite-status { min-height: 1.2em; margin: .4rem 0 0; color: var(--muted); font-size: .76rem; }
 .bibliography { margin: 0; padding: 0; list-style: none; counter-reset: ref; }
@@ -224,9 +231,11 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 
 <section class="summary" aria-labelledby="sum-h">
   <h2 id="sum-h" data-i18n="t-sum">结论</h2>
-  <p data-i18n="t-sum-1">Parcae 原配方训出来的模型，循环 4 轮就拿到了 94% 的收益，之后隐状态几乎不再变化，后面几轮基本在空转。</p>
-  <p data-i18n="t-sum-2">我们把训练改了两处：每次固定循环 4 轮，每一轮都计算梯度；循环块从第 2 轮起只看最近 64 个 token。同样的训练数据下，效果和原配方持平，较小的模型上还略好。训练快 1.25 到 1.4 倍，生成文本快 2 到 3 倍，KV 缓存约为原来的三分之一。</p>
-  <p data-i18n="t-sum-3">这些优势有边界。训练越久，优势越小，训到 20 亿 token 时原配方靠多循环几轮略微反超。而在我们这么小的规模上，参数量相同的普通 Transformer 用同样的训练时间，效果比所有循环版本都好。</p>
+  <ol>
+    <li data-i18n="t-sum-1">Parcae 原配方训出来的模型，循环 4 轮就拿到了 94% 的收益，之后隐状态几乎不再变化，后面几轮基本在空转。</li>
+    <li data-i18n="t-sum-2">我们把训练改了两处：每次固定循环 4 轮，每一轮都计算梯度；循环块从第 2 轮起只看最近 64 个 token。同样的训练数据下，效果和原配方持平，较小的模型上还略好。训练快 1.25 到 1.4 倍，生成文本快 2 到 3 倍，KV 缓存约为原来的三分之一。</li>
+    <li data-i18n="t-sum-3">这些优势有边界。训练越久，优势越小，训到 20 亿 token 时原配方靠多循环几轮略微反超。而在我们这么小的规模上，参数量相同的普通 Transformer 用同样的训练时间，效果比所有循环版本都好。</li>
+  </ol>
 </section>
 
 <p class="howto" data-i18n="t-howto" data-html><b>怎么读文中的数字。</b>文中的 loss 是验证集上的交叉熵，越低越好。在我们的规模上，loss 低 0.01，大约相当于多训 2% 到 5% 的数据。同一个配方换一个随机种子重新训练，loss 会有 0.001 到 0.01 的出入，所以差距在 0.01 以内的，我们一律算作持平。</p>
@@ -504,6 +513,11 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
   </div>
   <pre class="cite-code"><code id="cite-code"></code></pre>
   <p class="cite-status" id="cite-status" aria-live="polite"></p>
+</section>
+
+<section class="comments" aria-labelledby="comments-h">
+  <h2 id="comments-h" data-i18n="h-comments">讨论</h2>
+  <div class="comments-thread" id="comments-thread"></div>
 </section>
 
 <h2 id="references" data-i18n="h-ref">参考文献</h2>

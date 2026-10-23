@@ -2,7 +2,7 @@
   var EN = {
     't-outline': 'On this page',
     't-eyebrow': 'Research note · October 2026',
-    't-title': 'The Compute Ledger of a Loop Model',
+    't-title': 'Accounting for Compute in a Looped Model',
     't-dek': 'A looped language model reuses the same block of layers. The parameter count stays fixed while the computation can be made deeper, one pass at a time. Training is expensive: the Parcae recipe runs about eight loops per sample on average. We trained more than sixty small models on one laptop GPU to see how many of those loops are actually doing work, and what the saved compute can buy.',
     't-meta': '86.5M and 144M parameters · at most 2B training tokens · FineWeb-Edu',
     't-sum': 'Takeaway',
@@ -22,6 +22,7 @@
     'h-scale': 'The scale is small',
     'h-prior': 'Prior work',
     'h-details': 'Setup',
+    'h-comments': 'Discussion',
     'h-cite': 'Cite this article',
     'h-ref': 'References',
     'cite-help': 'Copy this BibTeX entry for papers or research notes.',
@@ -193,7 +194,7 @@
     'svg-sq': 'one square = one loop'
   };
 
-  var bib = '@misc{sheng2026loop,\n  author = {Sheng, Huanxin},\n  title = {The Compute Ledger of a Loop Model},\n  year = {2026},\n  month = oct,\n  url = {https://brucesheng1202.github.io/blog/loop-compute-ledger.html},\n  note = {Blog post}\n}';
+  var bib = '@misc{sheng2026loop,\n  author = {Sheng, Huanxin},\n  title = {Accounting for Compute in a Looped Model},\n  year = {2026},\n  month = oct,\n  url = {https://brucesheng1202.github.io/blog/loop-compute-ledger.html},\n  note = {Blog post}\n}';
 
   var lang = new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en';
   var frame = 0;
@@ -214,7 +215,7 @@
       else el.textContent = next;
     });
     document.title = lang === 'en'
-      ? 'The Compute Ledger of a Loop Model — Huanxin Sheng'
+      ? 'Accounting for Compute in a Looped Model — Huanxin Sheng'
       : '循环模型的算力账 — Huanxin Sheng';
     document.querySelectorAll('.lang button').forEach(function (button) {
       var on = button.getAttribute('data-lang') === lang;
@@ -308,10 +309,38 @@
     links.forEach(function (a) { a.classList.toggle('active', a === current); });
   }
 
+  function mountComments() {
+    var thread = document.getElementById('comments-thread');
+    if (!thread || location.protocol === 'file:') return;
+    var want = lang === 'zh' ? 'zh-CN' : 'en';
+    if (thread.dataset.ready === want && thread.querySelector('iframe.giscus-frame')) return;
+    thread.dataset.ready = want;
+    thread.replaceChildren();
+    var script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.dataset.repo = 'BruceSheng1202/BruceSheng1202.github.io';
+    script.dataset.repoId = 'R_kgDOMH0GSg';
+    script.dataset.category = 'Blog Comments';
+    script.dataset.categoryId = 'DIC_kwDOMH0GSs4DBPJB';
+    script.dataset.mapping = 'specific';
+    script.dataset.term = 'loop-compute-ledger';
+    script.dataset.strict = '1';
+    script.dataset.reactionsEnabled = '1';
+    script.dataset.emitMetadata = '0';
+    script.dataset.inputPosition = 'top';
+    script.dataset.theme = 'light';
+    script.dataset.lang = want;
+    script.dataset.loading = 'lazy';
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+    thread.appendChild(script);
+  }
+
   function render() {
     applyText();
     if (window.renderLoopCharts) window.renderLoopCharts(lang);
     buildRail();
+    mountComments();
     spy();
     document.documentElement.classList.remove('i18n-wait');
   }

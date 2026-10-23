@@ -341,7 +341,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 
 <p data-i18n="p-hidden">隐状态的变化也是这样。每多循环一轮，隐状态的改动大约只有上一轮的一半到三分之二，到第 12 轮已经小到和 bf16 的舍入误差相当。模型很快停在一个固定的状态上，再循环下去状态也不会变。原配方训练时平均跑的 8 轮里，后面几轮对结果几乎没有贡献，花的算力却和前几轮一样多。</p>
 
-<p data-i18n="p-hidden">那么很自然的，取到 elbow point 会不会也行？</p>
+<p data-i18n="p-hidden-2">那么很自然的，取到 elbow point 会不会也行？</p>
 
 <h2 id="recipe" class="sec" data-i18n="h-recipe">精简配方的两处改动</h2>
 <p data-i18n="p-recipe-1">据此，我们对原配方做了两处改动，合称精简配方（图 1 第三行）。第一，训练时每次固定循环 4 轮，4 轮都计算梯度，不再随机抽轮数，也不再有只做前向的轮次。第二，循环块只在第 1 轮看完整的上下文，第 2 到第 4 轮只看最近 64 个 token；开头和结尾的 4 层不变。</p>
@@ -401,7 +401,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
     </tbody></table></div></details>
 </figure>
 
-<p data-i18n="p-hidden">所以如果决定了就是要推理四轮，或许就应该在训练时也固定四轮，当然这符合直觉到十分 trivial。</p>
+<p data-i18n="p-hidden-3">所以如果决定了就是要推理四轮，或许就应该在训练时也固定四轮，当然这符合直觉到十分 trivial。</p>
 
 <h2 id="window" class="sec" data-i18n="h-window">循环块不需要看很远</h2>
 <p data-i18n="p-win-1">第二处改动来自一组削减实验。我们在 8650 万参数的模型上，从固定 4 轮模型的循环块里各削掉一部分计算，看哪些可以省（图 5）。</p>

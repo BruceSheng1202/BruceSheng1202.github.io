@@ -3,7 +3,7 @@
     't-outline': 'On this page',
     't-eyebrow': 'Research note · October 2026',
     't-title': 'Accounting for Compute in a Looped Model',
-    't-dek': 'A looped language model reuses the same block of layers. The parameter count stays fixed while the computation can be made deeper, one pass at a time. Training is expensive: the Parcae recipe runs about eight loops per sample on average. We trained more than sixty small models on one laptop GPU to see how many of those loops are actually doing work, and what the saved compute can buy.',
+    't-dek': 'A looped language model reuses the same block of layers. The parameter count stays fixed while the computation can be made deeper, one pass at a time. Training is expensive: the Parcae recipe runs about eight loops per sample on average. We trained more than sixty small models on a 5090 24G to see how many of those loops are actually doing work, and what the saved compute can buy.',
     't-meta': '86.5M and 144M parameters · at most 2B training tokens · FineWeb-Edu',
     't-sum': 'Takeaway',
     't-sum-1': 'A model trained with the original Parcae recipe collects 94% of its gain by loop 4. After that the hidden state almost stops moving, and the later loops mostly idle.',
@@ -45,11 +45,10 @@
     'p-led-1': 'Together, the two changes raise training throughput on the 144M model from 35k to 49k tokens per second, a factor of 1.42. Part of that is an inefficiency in the current original-recipe implementation. It draws a loop count per sample, so every sample in a batch waits for the longest one. Padding burns 15% to 20% of the compute. Drawing one count for the whole batch would make the original recipe about 15% faster, and the lean advantage would fall to 1.25 times.',
     'p-led-2': 'Faster training can be spent on a lower loss. We gave the original recipe less data so that wall-clock time matched, and both runs finished the learning-rate decay (Figure 6). At 5.7 hours the lean loss is 0.11 lower. At 11.3 hours it is 0.06 lower. On the 86.5M model, 1.8 hours gives a gap of 0.18. All six paired repeats agree on the direction. This comparison uses the original implementation as it stands. Fixing the padding inefficiency would, by a rough estimate, close a third to a half of the gap.',
     'p-led-3': 'Generation is where the gap is larger. A looped model stores a separate KV cache for each loop, so eight loops means eight copies. The lean recipe stores four loops, and three of them store only the last 64 tokens. Timed on the 144M layout (Figure 7), the lean recipe generates a token 2.3 to 3.1 times faster than the original recipe at 8 loops, with about one third of the cache. At a context of 16k tokens it is about as fast as a plain 6-layer Transformer of the same size, and the caches match, because both have only six layers that see the full context. At 2,000 tokens the plain Transformer is still about 20% faster.',
-    'p-note': 'This is our own benchmark, not a measurement inside an inference engine such as vLLM. An original-recipe model can also share one KV cache across loops, which is what <a href="https://arxiv.org/abs/2502.05171" data-citation="3">Huginn</a> does. Doing that with a fixed loop count hurts quality sharply (<a href="https://arxiv.org/abs/2610.06833" data-citation="2">Huang et al., 2026</a>). We did not measure that variant.',
     'p-gap-1': 'At matched wall-clock time, the gap falls from 0.18 on the smaller model, to 0.11 at 5.7 hours on the larger one, to 0.06 at 11.3 hours. Matching the amount of data instead of the time gives the same trend. At 144M parameters and 2B tokens, the original recipe at 12 loops is 0.005 to 0.009 better than the lean recipe, on both seeds. It spends three times the compute to get there. If it is also limited to 4 loops, it is still 0.013 to 0.014 worse.',
     'p-gap-2': 'More training seems to make extra loops more valuable, which matches the scaling reported in the Parcae paper. Whether fixing the count at more than four loops keeps the advantage is something we tried once, on the smaller model: eight fixed loops beat the original recipe by 0.034. That still needs a longer run.',
     'p-plain': 'On the 86.5M model we also trained a 6-layer Transformer with the same parameter count and no loop. At about two hours it has a lower loss than every looped variant, 0.03 to 0.04 below the lean recipe (the green line in the upper panel of Figure 6). At this size the loop itself is not yet worth it. The lean recipe closes part of the gap and does not reverse it. This comparison was run once, on the smaller model.',
-    'p-scale': 'Everything here is at most 144M parameters and 2B tokens, on one dataset and one laptop GPU. Most of the parameters sit in the embedding table. The compute-heavy part is 19.4M parameters in the smaller model and 43.7M in the larger one. These runs do not say what happens at a larger model or a longer training run.',
+    'p-scale': 'Everything here is at most 144M parameters and 2B tokens, on one dataset and one 5090 24G. Most of the parameters sit in the embedding table. The compute-heavy part is 19.4M parameters in the smaller model and 43.7M in the larger one. These runs do not say what happens at a larger model or a longer training run.',
     'p-prior': 'Most of the phenomena here have been seen in other settings.',
     'li-1': 'Drawing a random loop count and training only the last few loops comes from <a href="https://arxiv.org/abs/2502.05171" data-citation="3">Huginn</a> (Geiping et al., 2025). Parcae keeps that choice. Both Parcae and <a href="https://arxiv.org/abs/2610.06833" data-citation="2">Huang et al. (2026)</a> report that loss stops falling once inference uses more loops than the training average.',
     'li-2': 'Fixed-count training is common. <a href="https://arxiv.org/abs/2510.25741" data-citation="4">Ouro</a> and <a href="https://arxiv.org/abs/2605.20670" data-citation="5">LT2</a> both fix the count at 4. Huang et al. compare the two schedules from 100M to 1.6B parameters: at a matched mean, a fixed count beats a random one, but the model gets worse if inference uses a different count. The appendix of <a href="https://arxiv.org/abs/2609.19107" data-citation="6">Loop growth</a> also compares random and fixed counts.',
@@ -73,7 +72,7 @@
     'dt-eval': 'Evaluation',
     'dd-eval': 'Every model is scored at 1, 2, 3, 4, 6, 8, 12, 16, 24, and 32 loops. Every number is a finished run through the learning-rate decay, not a midpoint checkpoint.',
     'dt-hw': 'Hardware',
-    'dd-hw': 'One laptop RTX 5090 (24 GB), bf16, torch.compile.',
+    'dd-hw': 'One 5090 24G, bf16, torch.compile.',
     'foot-src': 'The numbers come from the evaluation record written at the end of each run. The raw timing and per-loop diagnostics are in the project log.',
     'foot-back': '← All notes',
     'show-data': 'Show the data',
@@ -330,7 +329,6 @@
     script.dataset.inputPosition = 'top';
     script.dataset.theme = 'light';
     script.dataset.lang = want;
-    script.dataset.loading = 'lazy';
     script.crossOrigin = 'anonymous';
     script.async = true;
     thread.appendChild(script);
@@ -340,9 +338,9 @@
     applyText();
     if (window.renderLoopCharts) window.renderLoopCharts(lang);
     buildRail();
-    mountComments();
     spy();
     document.documentElement.classList.remove('i18n-wait');
+    mountComments();
   }
 
   document.querySelectorAll('.lang button').forEach(function (button) {

@@ -61,7 +61,7 @@ h2.sec::before { content: counter(sec) ". "; }
 h3 { counter-increment: sub; }
 h3::before { content: counter(sec) "." counter(sub) " "; }
 .eyebrow { font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); margin: 0; }
-h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(32px, 5vw, 42px); line-height: 1.2; letter-spacing: -0.035em; margin: 12px 0 16px; text-wrap: balance; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 2.7vw, 33px); line-height: 1.15; letter-spacing: -0.03em; margin: 12px 0 16px; white-space: nowrap; }
 .dek { font-size: 1.06rem; line-height: 1.68; color: var(--muted); margin: 0 0 14px; }
 .meta { font-family: var(--font-body); font-size: 0.83rem; color: var(--muted); margin: 0; }
 .summary { background: #fff; border: 1px solid var(--rule); border-radius: 16px; padding: 22px 26px; margin: 28px 0 0; }
@@ -113,6 +113,9 @@ footer.colophon { margin-top: 56px; padding: 28px 0 8px; border-top: 1px solid v
 footer.colophon p { margin: 0 0 12px; }
 footer.colophon a { color: var(--accent); text-decoration: none; }
 footer.colophon a:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+  h1 { white-space: normal; }
+}
 @media (max-width: 520px) {
   body { font-size: 17px; }
   .summary { padding: 18px 18px; }
@@ -181,9 +184,9 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 .cite-copy { flex: none; min-height: 36px; padding: 7px 12px; border: 1px solid var(--navy); border-radius: 6px; background: var(--navy); color: #fff; cursor: pointer; font: 650 .8rem/1 var(--font-body); }
 .cite-copy:hover { background: var(--accent); border-color: var(--accent); }
 .cite-code { margin: 1rem 0 0; padding: 16px 18px; overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: #f7f8fb; color: #263248; font: .8rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.comments { margin-top: 3.2rem; padding-top: 1.6rem; border-top: 1px solid var(--rule); font-family: var(--font-body); }
-.comments h2 { margin-top: 0; }
-.comments-thread { min-height: 118px; margin-top: 1.1rem; }
+.comments-section { margin-top: 3.2rem; padding-top: 1.6rem; border-top: 1px solid var(--rule); font-family: var(--font-body); }
+.comments-section h2 { margin-top: 0; }
+.comments-thread { min-height: 150px; margin-top: 1.1rem; }
 .comments-thread .giscus, .comments-thread .giscus-frame { width: 100%; }
 .cite-code code { font: inherit; white-space: pre; }
 .cite-status { min-height: 1.2em; margin: .4rem 0 0; color: var(--muted); font-size: .76rem; }
@@ -225,7 +228,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 <header>
   <p class="eyebrow" data-i18n="t-eyebrow">研究笔记 · 2026 年 10 月</p>
   <h1 data-i18n="t-title">循环模型的算力账</h1>
-  <p class="dek" data-i18n="t-dek">循环语言模型把同一组层反复使用，参数不变，计算却能一轮轮加深。代价是训练很贵，Parcae 的训练配方让每条样本平均循环 8 轮。我们在一张笔记本 GPU 上训练了 60 多个小模型，想弄清楚这 8 轮里有多少是必要的，省下来的算力又能换来什么。</p>
+  <p class="dek" data-i18n="t-dek">循环语言模型把同一组层反复使用，参数不变，计算却能一轮轮加深。代价是训练很贵，Parcae 的训练配方让每条样本平均循环 8 轮。我们在一张 5090 24G 上训练了 60 多个小模型，想弄清楚这 8 轮里有多少是必要的，省下来的算力又能换来什么。</p>
   <p class="meta"><span data-i18n="t-meta">模型 8650 万和 1.44 亿参数 · 训练数据最多 20 亿 token · FineWeb-Edu</span><span class="lang" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="zh">中文</button></span></p>
 </header>
 
@@ -469,8 +472,6 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
     <p class="tbl-note" data-i18n="note-lat">bf16，静态 KV 缓存，整个生成步骤用 CUDA graph 捕获，局部注意力的轮次用 64 格的环形缓存。耗时只取决于结构，与权重的具体数值无关，所以用的是随机权重。KV 缓存是一次 1 条时的大小。</p></details>
 </figure>
 
-<p class="note" data-i18n="p-note" data-html>这是我们自己写的测速程序，没有在 vLLM 这类推理框架里测过。原配方的模型还可以让各轮共用一份 KV 缓存来省内存，<a href="https://arxiv.org/abs/2502.05171" data-citation="3">Huginn</a> 用过这个办法；固定轮数的模型这样做效果会大幅下降（<a href="https://arxiv.org/abs/2610.06833" data-citation="2">Huang et al., 2026</a>）。这一项我们没有测。</p>
-
 <h2 id="limits" class="sec" data-i18n="h-limits">这些结论的边界</h2>
 <h3 id="limits-gap" data-i18n="h-gap">训练越久，优势越小</h3>
 <p data-i18n="p-gap-1">同样训练时间下的差距，从较小模型的 0.18，到较大模型训练 5.7 小时的 0.11，再到训练 11.3 小时的 0.06，一路在缩小。按同样的训练数据比，趋势也一样。1.44 亿参数的模型训到 20 亿 token 时，原配方循环 12 轮的 loss 比精简配方低 0.005 到 0.009，两个种子都是如此，原配方反超了。它要循环 12 轮才做到，是精简配方的 3 倍；如果它也只循环 4 轮，仍比精简配方差 0.013 到 0.014。</p>
@@ -478,7 +479,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
 <h3 id="limits-plain" data-i18n="h-plain">在这个规模上，普通 Transformer 更划算</h3>
 <p data-i18n="p-plain">在 8650 万参数的模型上，我们还训练了一个参数量相同、不循环的 6 层 Transformer。同样训练约 2 小时，它的 loss 比所有循环版本都低，比精简配方低 0.03 到 0.04（图 6 上图的绿线）。在这么小的规模上，循环本身还不划算，精简配方缩小了差距，但没有扭转。这个对比只在较小的模型上做了一次。</p>
 <h3 id="limits-scale" data-i18n="h-scale">规模很小</h3>
-<p data-i18n="p-scale">所有结论都来自最多 1.44 亿参数、20 亿 token 的训练，只用了一个数据集（FineWeb-Edu）和一张笔记本 GPU。这两个模型的参数大部分在词嵌入上，真正参与计算的分别只有 1940 万和 4370 万。更大的模型、更长的训练会怎样，这里的数据回答不了。</p>
+<p data-i18n="p-scale">所有结论都来自最多 1.44 亿参数、20 亿 token 的训练，只用了一个数据集（FineWeb-Edu）和一张 5090 24G。这两个模型的参数大部分在词嵌入上，真正参与计算的分别只有 1940 万和 4370 万。更大的模型、更长的训练会怎样，这里的数据回答不了。</p>
 
 <h2 id="prior" class="sec" data-i18n="h-prior">和已有工作的关系</h2>
 <p data-i18n="p-prior">这里的大部分现象，别人在别的设置下也见过。</p>
@@ -500,7 +501,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
   <dt data-i18n="dt-local">局部注意力</dt><dd data-i18n="dd-local">PyTorch FlexAttention 的因果滑动窗口，宽 64 个 token。</dd>
   <dt data-i18n="dt-rep">重复次数</dt><dd data-i18n="dd-rep">主要对比在 8650 万参数上用 3 个种子，在 1.44 亿参数上用 2 个种子。同一个种子下，各配方的初始化和数据顺序相同。削减实验各做一次。</dd>
   <dt data-i18n="dt-eval">评测</dt><dd data-i18n="dd-eval">每个模型分别在循环 1、2、3、4、6、8、12、16、24、32 轮时测验证 loss。每个数字都来自一次走完学习率衰减的完整训练，不是中途的检查点。</dd>
-  <dt data-i18n="dt-hw">硬件</dt><dd data-i18n="dd-hw">一张 RTX 5090 笔记本 GPU（24 GB），bf16，torch.compile。</dd>
+  <dt data-i18n="dt-hw">硬件</dt><dd data-i18n="dd-hw">一张 5090 24G，bf16，torch.compile。</dd>
 </dl>
 
 <section class="cite" aria-labelledby="cite-h">
@@ -515,7 +516,7 @@ a[data-citation].citation-active::after { color: var(--accent); border-color: va
   <p class="cite-status" id="cite-status" aria-live="polite"></p>
 </section>
 
-<section class="comments" aria-labelledby="comments-h">
+<section class="comments-section" aria-labelledby="comments-h">
   <h2 id="comments-h" data-i18n="h-comments">讨论</h2>
   <div class="comments-thread" id="comments-thread"></div>
 </section>

@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="用 18.5 万道公开数据题训练一个 4B 决策模型来做机器人操作评判：8 个模型的同一套评测。">
+  <title>决策模型能为机器人操作做什么：JevAny-Robotics-4B — Huanxin Sheng</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="content.js"></script>
+  <style>
+    .article-head h1 { white-space: normal; text-wrap: balance; }
+    .table-scroll table { font-size: .79rem; }
+    .table-scroll th, .table-scroll td { padding: 6px 8px; }
+    .table-scroll th { white-space: normal; }
+    .table-hint { margin: -1.1rem 0 2rem; color: var(--muted); font: .76rem/1.4 var(--sans); text-align: right; }
+  </style>
+</head>
+<body>
+  <header class="topbar"><nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="../../index.html">Huanxin Sheng</a>
+    <div class="navlinks"><a href="../../index.html">Homepage</a><a href="../index.html" aria-current="page">Blog</a></div>
+  </nav></header>
+  <main class="article-shell">
+    <aside id="toc" class="toc" aria-label="Table of contents">
+      <div class="toc-title">本文目录</div>
+      <div id="toc-links"></div>
+    </aside>
+    <div class="article-main">
+      <header class="article-head">
+        <h1>决策模型能为机器人操作做什么：JevAny-Robotics-4B</h1>
+        <p class="dek">4B（Qwen3.5-4B + LoRA，pointer 读出）· 18.5 万道训练题 · 只用公开数据集的 train split · 8 个对比模型，同一套评测</p>
+        <div class="meta article-meta">
+          <span>Huanxin Sheng</span><span>·</span><span>2026 年 10 月</span><span>·</span><span>约 14 分钟阅读</span>
+        </div>
+      </header>
+      <article id="article" class="article" aria-live="polite"><p>正在载入文章…</p></article>
+    </div>
+    <aside id="citation-rail" class="citation-rail" aria-label="References cited alongside the article">
+      <div id="citation-notes"></div>
+    </aside>
+  </main>
+  <footer class="footer"><div class="wrap"><a href="../index.html">← 返回全部文章</a></div></footer>
+  <script src="../assets/language.js"></script>
+  <script>
+    let request = 0;
+    const giscusConfig = Object.freeze({
+      repo: 'BruceSheng1202/BruceSheng1202.github.io',
+      repoId: 'R_kgDOMH0GSg',
+      category: 'Blog Comments',
+      categoryId: 'DIC_kwDOMH0GSs4DBPJB',
+      term: 'jevany-robotics'
+    });
+    const bibtexCitation = `@misc{sheng2026jevanyrobotics,
+  author = {Sheng, Huanxin},
+  title  = {What Can a Decision Model Do for Robot Manipulation? JevAny-Robotics-4B},
+  year   = {2026},
+  month  = oct,
+  url    = {https://brucesheng1202.github.io/blog/jevany-robotics/},
+  note   = {Blog post}
+}`;
+    let tocHeadings = [];
+    let tocFrame = 0;
+    let citationFrame = 0;
+    function slug(text, i) { return text.toLowerCase().replace(/<[^>]+>/g,'').replace(/[^a-z0-9\u4e00-\u9fff]+/g,'-').replace(/^-|-$/g,'') || `section-${i}`; }
+    function articleLang(requested) {
+      const content = window.ROBOTICS_CONTENT || {};
+      if (content[requested]) return requested;
+      return content.zh ? 'zh' : 'en';
+    }
+    function findReferences(article) {
+      return [...article.querySelectorAll('h1')].find(h => {
+        const text = h.textContent.trim().toLowerCase();
+        return text === 'references' || text === '参考文献';
+      });
+    }
+    function citationKey(href) {
+      try {
+        const url = new URL(href, location.href);
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        if (host === 'arxiv.org') {
+          const match = url.pathname.match(/\/(?:abs|pdf)\/([^/]+?)(?:\.pdf)?$/);
+          if (match) return `arxiv:${match[1].replace(/v\d+$/i, '')}`;
+        }
+        if (host === 'openreview.net') {
+          return `openreview:${url.searchParams.get('id') || url.pathname.replace(/\/$/, '')}`;
+        }
+        if (host === 'doi.org') return `doi:${url.pathname.replace(/^\/|\/$/g, '').toLowerCase()}`;
+        return `${host}${url.pathname.replace(/\/$/, '')}${url.search}`;
+      } catch (_) {
+        return href;
+      }
+    }
+    function updateToc() {
+      if (!tocHeadings.length) return;
+      let current = tocHeadings[0];
+      for (const heading of tocHeadings) {
+        if (heading.getBoundingClientRect().top <= 118) current = heading;
+        else break;
+      }
+      document.querySelectorAll('#toc-links a').forEach(link => {
+        const active = link.getAttribute('href') === `#${current.id}`;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+    function scheduleTocUpdate() {
+      cancelAnimationFrame(tocFrame);
+      tocFrame = requestAnimationFrame(updateToc);
+    }
+    function buildToc(headings) {
+      tocHeadings = headings;
+      const toc = document.getElementById('toc-links');
+      toc.innerHTML = '';
+      headings.forEach(h => {
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.textContent = h.textContent;
+        if (h.tagName === 'H2') a.className = 'toc-subsection';
+        toc.appendChild(a);
+      });
+      scheduleTocUpdate();
+    }
+    function layoutCitationNotes() {
+      const rail = document.getElementById('citation-rail');
+      const main = document.querySelector('.article-main');
+      const notes = [...document.querySelectorAll('.citation-note')];
+      if (!rail || !main || !notes.length) return;
+      rail.style.minHeight = `${main.offsetHeight}px`;
+      if (getComputedStyle(rail).display === 'none') return;
+
+      const railTop = rail.getBoundingClientRect().top + window.scrollY;
+      let nextTop = 0;
+      notes.forEach(note => {
+        const source = document.getElementById(note.dataset.sourceId);
+        if (!source) return;
+        const desiredTop = source.getBoundingClientRect().top + window.scrollY - railTop - 2;
+        const top = Math.max(desiredTop, nextTop);
+        note.style.top = `${Math.round(top)}px`;
+        nextTop = top + note.offsetHeight + 14;
+      });
+    }
+    function scheduleCitationLayout() {
+      cancelAnimationFrame(citationFrame);
+      citationFrame = requestAnimationFrame(() => requestAnimationFrame(layoutCitationNotes));
+    }
+    function buildCitationRail(article, lang) {
+      const notes = document.getElementById('citation-notes');
+      notes.innerHTML = '';
+      const references = findReferences(article);
+      if (!references) return;
+
+      const referencesByUrl = new Map();
+      for (let node = references.nextElementSibling; node; node = node.nextElementSibling) {
+        if (node.matches('h1, h2, section')) break;
+        if (node.tagName !== 'P') continue;
+        node.querySelectorAll('a[href]').forEach(link => {
+          referencesByUrl.set(citationKey(link.href), node);
+        });
+      }
+
+      const citedLinks = [];
+      for (let node = article.firstElementChild; node && node !== references; node = node.nextElementSibling) {
+        if (node.classList.contains('comments-section')) continue;
+        citedLinks.push(...node.querySelectorAll('a[href]'));
+      }
+
+      let citationIndex = 0;
+      citedLinks.forEach(link => {
+        const reference = referencesByUrl.get(citationKey(link.href));
+        if (!reference) return;
+        citationIndex += 1;
+        const sourceId = `citation-source-${citationIndex}`;
+        link.id = sourceId;
+        link.dataset.citation = String(citationIndex);
+
+        const note = document.createElement('div');
+        note.className = 'citation-note';
+        note.dataset.sourceId = sourceId;
+        note.setAttribute('role', 'note');
+        note.setAttribute('aria-label', `${lang === 'zh' ? '引用' : 'Reference'} ${citationIndex}`);
+        note.innerHTML = `<span class="citation-number" aria-hidden="true">${citationIndex}</span><div class="citation-copy">${reference.innerHTML}</div>`;
+        note.querySelectorAll('a[href]').forEach(source => {
+          source.textContent = lang === 'zh' ? '查看来源 ↗' : 'Open source ↗';
+          source.target = '_blank';
+          source.rel = 'noreferrer';
+        });
+
+        const setActive = active => {
+          link.classList.toggle('citation-active', active);
+          note.classList.toggle('active', active);
+        };
+        link.addEventListener('mouseenter', () => setActive(true));
+        link.addEventListener('mouseleave', () => setActive(false));
+        link.addEventListener('focus', () => setActive(true));
+        link.addEventListener('blur', () => setActive(false));
+        note.addEventListener('mouseenter', () => setActive(true));
+        note.addEventListener('mouseleave', () => setActive(false));
+        notes.appendChild(note);
+      });
+
+      article.querySelectorAll('img').forEach(img => {
+        if (!img.complete) img.addEventListener('load', scheduleCitationLayout, { once: true });
+      });
+      scheduleCitationLayout();
+    }
+    function insertBibtexCitation(article, lang) {
+      const references = findReferences(article);
+      if (!references) return;
+
+      const section = document.createElement('section');
+      section.className = 'bibtex-section';
+      section.setAttribute('aria-labelledby', 'bibtex-heading');
+      section.innerHTML = `
+        <div class="bibtex-heading">
+          <div>
+            <h1 id="bibtex-heading">${lang === 'zh' ? '引用本文' : 'Cite this article'}</h1>
+            <p>${lang === 'zh' ? '复制以下 BibTeX 条目用于论文或研究笔记。' : 'Copy this BibTeX entry for papers or research notes.'}</p>
+          </div>
+          <button class="bibtex-copy" type="button">${lang === 'zh' ? '复制 BibTeX' : 'Copy BibTeX'}</button>
+        </div>
+        <pre class="bibtex-code"><code></code></pre>
+        <p class="bibtex-status" aria-live="polite"></p>`;
+      references.before(section);
+
+      section.querySelector('code').textContent = bibtexCitation;
+      const button = section.querySelector('.bibtex-copy');
+      const status = section.querySelector('.bibtex-status');
+      const defaultLabel = button.textContent;
+      button.addEventListener('click', async () => {
+        let copied = false;
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
+          await navigator.clipboard.writeText(bibtexCitation);
+          copied = true;
+        } catch (_) {}
+        if (!copied) {
+          const textarea = document.createElement('textarea');
+          textarea.value = bibtexCitation;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            copied = document.execCommand('copy');
+          } finally {
+            textarea.remove();
+          }
+        }
+        if (!copied) {
+          status.textContent = lang === 'zh'
+            ? '自动复制失败，请手动选择上方条目。'
+            : 'Automatic copy failed. Please select the entry above.';
+          return;
+        }
+        button.textContent = lang === 'zh' ? '已复制' : 'Copied';
+        status.textContent = lang === 'zh' ? 'BibTeX 已复制到剪贴板。' : 'BibTeX copied to the clipboard.';
+        window.setTimeout(() => {
+          button.textContent = defaultLabel;
+          status.textContent = '';
+        }, 2400);
+      });
+    }
+    function insertComments(article, lang) {
+      const references = findReferences(article);
+      if (!references) return;
+
+      const section = document.createElement('section');
+      section.className = 'comments-section';
+      section.setAttribute('aria-labelledby', 'comments-heading');
+      section.innerHTML = `
+        <h1 id="comments-heading">${lang === 'zh' ? '讨论' : 'Discussion'}</h1>
+        <div class="comments-thread" id="comments-thread"></div>`;
+      references.before(section);
+
+      const thread = section.querySelector('.comments-thread');
+      if (location.protocol === 'file:') return;
+      if (!giscusConfig.repoId || !giscusConfig.categoryId) {
+        thread.innerHTML = `<p class="comments-setup">${lang === 'zh'
+          ? '评论区正在等待连接 GitHub Discussions。'
+          : 'The comment thread is waiting for its GitHub Discussions connection.'}</p>`;
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.dataset.repo = giscusConfig.repo;
+      script.dataset.repoId = giscusConfig.repoId;
+      script.dataset.category = giscusConfig.category;
+      script.dataset.categoryId = giscusConfig.categoryId;
+      script.dataset.mapping = 'specific';
+      script.dataset.term = giscusConfig.term;
+      script.dataset.strict = '1';
+      script.dataset.reactionsEnabled = '1';
+      script.dataset.emitMetadata = '0';
+      script.dataset.inputPosition = 'top';
+      script.dataset.theme = 'light';
+      script.dataset.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      script.dataset.loading = 'lazy';
+      script.crossOrigin = 'anonymous';
+      script.async = true;
+      thread.appendChild(script);
+    }
+    function renderTables(article, lang) {
+      article.querySelectorAll('table').forEach(table => {
+        const wrap = document.createElement('div');
+        wrap.className = 'table-scroll';
+        table.parentNode.insertBefore(wrap, table);
+        wrap.appendChild(table);
+        if (wrap.scrollWidth > wrap.clientWidth + 2) {
+          const hint = document.createElement('div');
+          hint.className = 'table-hint';
+          hint.textContent = lang === 'zh' ? '表格可横向滚动 →' : 'Scroll the table sideways →';
+          wrap.after(hint);
+        }
+      });
+    }
+    function renderFigures(article) {
+      article.querySelectorAll('img').forEach(img => {
+        img.loading = 'lazy';
+        const paragraph = img.parentElement;
+        const figure = document.createElement('figure');
+        if (paragraph?.tagName === 'P' && paragraph.children.length === 1) paragraph.replaceWith(figure);
+        else img.parentNode.insertBefore(figure, img);
+        figure.appendChild(img);
+
+        const note = figure.nextElementSibling;
+        const caption = document.createElement('figcaption');
+        if (note?.tagName === 'P' && note.children.length === 1 && note.firstElementChild?.tagName === 'EM') {
+          caption.innerHTML = note.firstElementChild.innerHTML;
+          note.remove();
+        } else if (img.alt) {
+          caption.textContent = img.alt;
+        }
+        if (caption.innerHTML.trim()) figure.appendChild(caption);
+      });
+    }
+    async function render(lang) {
+      lang = articleLang(lang);
+      const current = ++request;
+      const article = document.getElementById('article');
+      document.getElementById('toc-links').innerHTML = '';
+      document.getElementById('citation-notes').innerHTML = '';
+      article.innerHTML = `<p>${lang === 'zh' ? '正在载入文章…' : 'Loading article…'}</p>`;
+      try {
+        if (!window.ROBOTICS_CONTENT || !window.marked) throw new Error('content unavailable');
+        const md = window.ROBOTICS_CONTENT[lang];
+        if (current !== request) return;
+        article.innerHTML = marked.parse(md);
+        renderTables(article, lang);
+        renderFigures(article);
+        insertBibtexCitation(article, lang);
+        insertComments(article, lang);
+        const headings = [...article.querySelectorAll('h1, h2')];
+        headings.forEach((h, i) => { h.id = h.id || slug(h.textContent, i); });
+        if (current !== request) return;
+        buildToc(headings);
+        buildCitationRail(article, lang);
+      } catch (_) { article.innerHTML = `<p>${lang === 'zh' ? '文章载入失败，请刷新页面重试。' : 'The article could not be loaded. Please refresh the page.'}</p>`; }
+    }
+    window.addEventListener('scroll', scheduleTocUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      scheduleTocUpdate();
+      scheduleCitationLayout();
+    });
+    if (document.fonts?.ready) document.fonts.ready.then(scheduleCitationLayout);
+    document.addEventListener('languagechange', e => render(e.detail.lang));
+    render(window.siteLanguage.get());
+  </script>
+</body>
+</html>

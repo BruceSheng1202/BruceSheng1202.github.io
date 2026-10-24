@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="用 18.5 万道公开数据题训练一个 4B 决策模型来做机器人操作评判：8 个模型的同一套评测。">
-  <title>决策模型能为机器人操作做什么：JevAny-Robotics-4B — Huanxin Sheng</title>
+  <meta name="description" content="Training a 4B decision model on 184,942 questions from public train splits to judge robot manipulation, against 8 models in one harness.">
+  <title>What Can a Decision Model Do for Robot Manipulation? JevAny-Robotics-4B — Huanxin Sheng</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="content.js"></script>
@@ -23,15 +23,16 @@
   </nav></header>
   <main class="article-shell">
     <aside id="toc" class="toc" aria-label="Table of contents">
-      <div class="toc-title">本文目录</div>
+      <div class="toc-title" data-en="On this page" data-zh="本文目录">On this page</div>
       <div id="toc-links"></div>
     </aside>
     <div class="article-main">
       <header class="article-head">
-        <h1>决策模型能为机器人操作做什么：JevAny-Robotics-4B</h1>
-        <p class="dek">4B（Qwen3.5-4B + LoRA，pointer 读出）· 18.5 万道训练题 · 只用公开数据集的 train split · 8 个对比模型，同一套评测</p>
+        <h1 data-en="What Can a Decision Model Do for Robot Manipulation? JevAny-Robotics-4B" data-zh="决策模型能为机器人操作做什么：JevAny-Robotics-4B">What Can a Decision Model Do for Robot Manipulation? JevAny-Robotics-4B</h1>
+        <p class="dek" data-en="A 4B model (Qwen3.5-4B + LoRA, pointer readout) · 184,942 training questions · public train splits only · 8 comparison models in one harness" data-zh="4B（Qwen3.5-4B + LoRA，pointer 读出）· 18.5 万道训练题 · 只用公开数据集的 train split · 8 个对比模型，同一套评测">A 4B model (Qwen3.5-4B + LoRA, pointer readout) · 184,942 training questions · public train splits only · 8 comparison models in one harness</p>
         <div class="meta article-meta">
-          <span>Huanxin Sheng</span><span>·</span><span>2026 年 10 月</span><span>·</span><span>约 14 分钟阅读</span>
+          <span>Huanxin Sheng</span><span>·</span><span data-en="October 2026" data-zh="2026 年 10 月">October 2026</span><span>·</span><span data-en="16 min read" data-zh="约 12 分钟阅读">14 min read</span>
+          <div class="lang article-lang" aria-label="Article language"><button data-lang="en">EN</button><button data-lang="zh">中文</button></div>
         </div>
       </header>
       <article id="article" class="article" aria-live="polite"><p>正在载入文章…</p></article>
@@ -40,7 +41,7 @@
       <div id="citation-notes"></div>
     </aside>
   </main>
-  <footer class="footer"><div class="wrap"><a href="../index.html">← 返回全部文章</a></div></footer>
+  <footer class="footer"><div class="wrap"><a href="../index.html" data-en="← All notes" data-zh="← 返回全部文章">← All notes</a></div></footer>
   <script src="../assets/language.js"></script>
   <script>
     let request = 0;
@@ -353,6 +354,8 @@
         renderFigures(article);
         insertBibtexCitation(article, lang);
         insertComments(article, lang);
+        const refHeading = findReferences(article);
+        if (refHeading) refHeading.id = 'references';
         const headings = [...article.querySelectorAll('h1, h2')];
         headings.forEach((h, i) => { h.id = h.id || slug(h.textContent, i); });
         if (current !== request) return;

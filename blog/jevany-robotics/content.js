@@ -264,7 +264,7 @@ If you use it for a binary decision (say, whether progress is rising), set the t
 
 # 5 公开数据能把 4B 训到哪里
 
-我们把 8 个模型放进同一套 harness，题目和媒体完全相同。一边是支持多模态的 Jev 类决策模型：JevAny-27B、OneJev-27B、OmniJev-4B；另一边是专门为机器人训练的奖励模型：[Robo-Dopamine-GRM-2.0-8B](https://arxiv.org/abs/2608.15680)、RoboReward-8B / 4B、[Robometer-4B](https://arxiv.org/abs/2603.02115)（图 3）。
+我们把 8 个模型放进同一套 harness，题目和媒体完全相同。一边是支持多模态的 Jev 类决策模型：[JevAny-27B](https://huggingface.co/SimpleJev/JevAny-Qwen3.8-27B-LoRA)、OneJev-27B、OmniJev-4B；另一边是专门为机器人训练的奖励模型：[Robo-Dopamine-GRM-2.0-8B](https://arxiv.org/abs/2608.15680)、RoboReward-8B / 4B、[Robometer-4B](https://arxiv.org/abs/2603.02115)（图 3）。
 
 ![Model comparison across seven benchmarks](img/figure-003.png)
 

@@ -1,12 +1,14 @@
+<p class="post-links"><strong>Model</strong> <a href="https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA">JevAny-Robotics-4B-LoRA</a><span class="sep">·</span><strong>Evaluation set</strong> <a href="https://huggingface.co/datasets/SimpleJev/JevAny-Robotics-Public">JevAny-Robotics-Public</a><span class="sep">·</span><strong>Code</strong> <a href="https://github.com/SimpleJev/JevAny">SimpleJev/JevAny</a></p>
+
 Decision models (Jev-style, System One) answer questions differently from generative models: give one a state and a set of options, and it returns a probability for every option in a single forward pass, without generating text. We wanted to know how far a 4B decision model gets at judging robot manipulation when it is trained only on public data with our own recipe.
 
-# Conclusions
+# 1 Conclusions
 
-1. **Public data alone is enough to train a strong 4B decision model.** On RoboPulse, RoboRewardBench, and human-rated real-robot rollouts (RoboArena) it beats every multimodal Jev-style model we tested, including 27B ones; on RoboPulse++ and policy ranking it ties with the 27B models. Specialist robot reward models still win on their home ground: Robo-Dopamine on fine-grained progress (RoboPulse 90% vs. 71%), RoboReward on 1–5 scoring (MAE 0.358 vs. 0.443).
+1. **Public data alone is enough to train a strong 4B decision model.** On [RoboPulse](https://arxiv.org/abs/2603.21669), [RoboRewardBench](https://arxiv.org/abs/2601.00675), and human-rated real-robot rollouts (RoboArena) it beats every multimodal Jev-style model we tested, including 27B ones; on RoboPulse++ and policy ranking it ties with the 27B models. Specialist robot reward models still win on their home ground: Robo-Dopamine on fine-grained progress (RoboPulse 90% vs. 71%), RoboReward on 1–5 scoring (MAE 0.358 vs. 0.443).
 2. **Its probabilities are trustworthy, and it is fast.** On RoboRewardBench its NLL is the lowest of every model we tested (1.02; RoboReward-8B 1.39); 185 ms per judgment on a single A100, versus 316 ms for Robo-Dopamine-8B, and 732–838 ms for a 27B judge spread over two GPUs.
 3. **The weaknesses are clear, and they look fixable.** Fine-grained progress, the synthetic questions in RoboRewardBench, and multi-camera views are where it is weakest. After continued training on 22k new real-robot questions, two-camera progress AUROC rises from 0.65 to 0.77 (the confidence interval just touches 0), but single-view gets worse and the overall picture is flat, so the release stays at the first version (v0.2).
 
-# One model, every question you would ask about a rollout
+# 2 One model, every question you would ask about a rollout
 
 Give it a robot rollout and a question, and it returns a probability for every possible answer. Anything you would ask about a rollout, it can answer:
 
@@ -24,19 +26,19 @@ Ask "how far along is the task" at every frame and you get a progress curve (Fig
 
 ***Figure 1** Frame-by-frame scoring of two RoboArena real-robot rollouts (the RoboArena subset of RoboRewardBench, DROID platform): for every prefix of the video we ask "if the episode ended here, how well is the task done (1–5)", and the curve is the expected score. Both examples were chosen because the model's final score agrees with the human rating.*
 
-# A decision model returns every option's probability in one forward pass
+# 3 A decision model returns every option's probability in one forward pass
 
 Each question pairs a state (task instruction, image, or video) with a typed question: yes/no, multiple choice, or 1–5 scoring, with the options and the grading rubric written into the question. The model encodes the state together with all the options, a pointer head scores the options, and it emits a probability distribution directly instead of generating token by token.
 
 That gives two properties that are useful for judging robots. First, any number of options costs one pass, so latency does not grow with the length of the answer. Second, the output already is a probability, so it can serve directly as a reward signal, as a filter for data, or as a way to decide when a case should go to a human for review.
 
-JevAny-Robotics-4B warm-starts from our open-source JevAny-Qwen3.5-4B-LoRA, which was trained on general decision data on a Qwen3.5-4B base. We train only the LoRA (r = 8, 17.6M trainable parameters) and the pointer head: one epoch, 5,780 steps, global batch 32, learning rate 1e-5, about 13–14 hours on 4×A100-40GB. Images are used at native resolution; videos are resampled to roughly 1–2 fps and 8–32 frames, then fed in with all frames.
+[JevAny-Robotics-4B](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA) warm-starts from our open-source [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA), which was trained on general decision data on a Qwen3.5-4B base. We train only the LoRA (r = 8, 17.6M trainable parameters) and the pointer head: one epoch, 5,780 steps, global batch 32, learning rate 1e-5, about 13–14 hours on 4×A100-40GB. Images are used at native resolution; videos are resampled to roughly 1–2 fps and 8–32 frames, then fed in with all frames.
 
-# Training data comes only from public train splits
+# 4 Training data comes only from public train splits
 
 The question we wanted to answer: with no new data collection and no human annotation, how far can we train a 4B model just by rewriting existing public data as decision questions?
 
-The sources are the train splits of RoboReward, Robo-Dopamine GRM, Guardian (BDV2 / RLBench), DenseReward, RoboFAC, ViFailback, and RoboVQA, covering real and simulated robots, images and video. Each source labels things differently: whole-episode 1–5 scores, frame-level progress, success labels, failure types, whether a plan is correct. We rewrite all of it uniformly into 7 question types: pairwise progress, adjacent-frame direction, 1–5 scoring, execution success, failure type and plan checks, failure localization, and trajectory preference — 184,942 questions in total (Figure 2).
+The sources are the train splits of [RoboReward](https://arxiv.org/abs/2601.00675), [Robo-Dopamine GRM](https://arxiv.org/abs/2512.23703), [Guardian](https://arxiv.org/abs/2512.01946) (BDV2 / RLBench), [DenseReward](https://arxiv.org/abs/2607.13033), [RoboFAC](https://arxiv.org/abs/2505.12224), [ViFailback](https://arxiv.org/abs/2512.02787), and [RoboVQA](https://arxiv.org/abs/2311.00899), covering real and simulated robots, images and video. Each source labels things differently: whole-episode 1–5 scores, frame-level progress, success labels, failure types, whether a plan is correct. We rewrite all of it uniformly into 7 question types: pairwise progress, adjacent-frame direction, 1–5 scoring, execution success, failure type and plan checks, failure localization, and trajectory preference — 184,942 questions in total (Figure 2).
 
 ![Training data pipeline](img/figure-002.png)
 
@@ -48,9 +50,9 @@ One caveat: decontamination removes the same episode, not the same scene or the 
 
 The training set, JevAny-Robotics-Train-v0.2, is still clearing redistribution permissions for some sources and will be released once that is done.
 
-# How far public data takes a 4B model: past other multimodal Jev models, with specialists still holding their home ground
+# 5 How far public data takes a 4B model
 
-We put 8 models into the same harness, with identical questions and media. On one side are multimodal Jev-style decision models: JevAny-27B, OneJev-27B, OmniJev-4B. On the other are reward models trained specifically for robotics: Robo-Dopamine-GRM-2.0-8B, RoboReward-8B / 4B, Robometer-4B (Figure 3).
+We put 8 models into the same harness, with identical questions and media. On one side are multimodal Jev-style decision models: [JevAny-27B](https://huggingface.co/SimpleJev/JevAny-Qwen3.8-27B-LoRA), OneJev-27B, OmniJev-4B. On the other are reward models trained specifically for robotics: [Robo-Dopamine-GRM-2.0-8B](https://arxiv.org/abs/2608.15680), RoboReward-8B / 4B, [Robometer-4B](https://arxiv.org/abs/2603.02115) (Figure 3).
 
 ![Model comparison across seven benchmarks](img/figure-003.png)
 
@@ -70,7 +72,7 @@ The main numbers:
 
 ᵃ RoboReward only scores whole episodes; the pairwise questions are our adaptation. ᵇ Robo-Dopamine uses first-to-last-frame progress as its score, with the cut point fitted on val. ᶜ Two of the five sets have their train split in our training data. The adaptation rules are in "Experimental details". Numbers for RoboReward-4B and OmniJev-4B are on the model card.
 
-Against the multimodal Jev-style models, this 4B model beats JevAny-27B and OneJev-27B, which have about 7× its parameters, on RoboPulse, RoboRewardBench, and RoboArena real-robot rollouts. The largest gap is RoboPulse: 71.1% against 56.6% and 60.4%. On RoboPulse++ our number is higher, but the gap is inside the confidence interval; on policy ranking the three tie. OneJev-27B is still better at success detection and trajectory preference (AUROC 0.903 vs. 0.872, paired difference −0.031 \[−0.052, −0.012\]; preference 0.836 vs. 0.771).
+Against the multimodal Jev-style models, this 4B model beats JevAny-27B and OneJev-27B, which have about 7× its parameters, on RoboPulse, RoboRewardBench, and RoboArena real-robot rollouts. The largest gap is RoboPulse: 71.1% against 56.6% and 60.4%. On [RoboPulse++](https://arxiv.org/abs/2608.14284) our number is higher, but the gap is inside the confidence interval; on policy ranking the three tie. OneJev-27B is still better at success detection and trajectory preference (AUROC 0.903 vs. 0.872, paired difference −0.031 \[−0.052, −0.012\]; preference 0.836 vs. 0.771).
 
 Against the specialist reward models, the conclusion depends on whether the question is their home turf.
 
@@ -80,7 +82,7 @@ Against the specialist reward models, the conclusion depends on whether the ques
 
 Our reading: with public data alone, a small decision model can answer every kind of question and place near the top on each; but on one fixed format, a model trained specifically for that format is still stronger.
 
-# Trustworthy probabilities, and fast
+# 6 Trustworthy probabilities, and fast
 
 A reward signal has to be right, and it has to know when it is uncertain. Every RoboRewardBench video requires a distribution over 1–5, and we compared every model that can produce one (Figure 4).
 
@@ -113,37 +115,28 @@ On speed, the benefit of a single forward pass is real. The table below gives me
 | RoboReward-8B, normal generation | – | 361 ms |
 | 27B Jev-style model, reference kernel, 2 GPUs | 732–838 ms | – |
 
-We are faster than Robo-Dopamine-8B and the 27B models, but slower than RoboReward on RoboRewardBench. The reason is that we feed every frame at native resolution: the median episode is 1,433 visual tokens, about 2.5× RoboReward's 564. Compressing the input to JevAny's default of 8 frames and 512×512 total pixels brings latency down to 187 ms, but RoboRewardBench MAE rises from 0.443 to 0.607 and RoboArena from 0.687 to 1.289. So this model really has to run on the full media.
+We are faster than Robo-Dopamine-8B and the 27B models, but slower than RoboReward on RoboRewardBench. The reason is that we feed every frame at native resolution: the median episode is 1,433 visual tokens, about 2.5× RoboReward's 564. Compressing the input to JevAny's default of 8 frames and 512×512 total pixels brings latency down to 187 ms, but RoboRewardBench MAE rises from 0.443 to 0.607 and RoboArena from 0.687 to 1.289.
 
-# Where these conclusions stop
+# 7 Where these conclusions stop
 
-## Fine-grained progress is still far off
+## 7.1 Fine-grained progress is still far off
 
 On RoboPulse, 71.1% against Robo-Dopamine's 90.1% is the largest gap in this post. We checked that test overlap is not the cause: on the 939 questions whose episodes are not in Robo-Dopamine's public training data, it still scores 87.5% and we score 68.8%. By source, it leads on all 9. Our reading is that small progress changes need a large amount of dense supervision in the same format, and public data only gave us a fraction of that.
 
 RoboPulse++ has a threshold problem as well. In training, rising and falling are 1:1; in the test set 81% rise. At the default threshold of 0.5 accuracy is only 60.4%, below the 81.1% of "always predict rising". Ranking quality (AUROC) and balanced accuracy are the meaningful metrics here, and in practice the threshold should be set on your own data.
 
-## The synthetic questions in RoboRewardBench
+## 7.2 The synthetic questions in RoboRewardBench
 
 Part of RoboRewardBench OXE is a set of constructed questions: successful videos with the task instruction swapped, and videos truncated in the middle. RoboReward was trained on exactly this kind of construction and is clearly better on both (MAE 0.223 vs. 0.297 and 0.418 vs. 0.584). We often read a truncated video as "almost done". A few other small subsets (such as utokyo\_xarm\_bimanual and stanford\_hydra) have high error, and the training data holds only a few hundred scoring questions for them.
 
-## Multi-view
+## 7.3 Other findings
 
-Questions that require watching 2–3 cameras at once remain the weakest category. On RoboPulse++, single-view AUROC is 0.758, two-view 0.646, three-view 0.672.
+- **Multi-view**: questions that require watching 2–3 cameras at once remain the weakest category. On RoboPulse++, single-view AUROC is 0.758, two-view 0.646, three-view 0.672.
+- **Success detection and preference**: OneJev-27B is better on JevAny-Robotics-Public. And two of the five success sets have their train split in our training data, so this number is biased in our favor.
+- **Speed**: full media means more tokens per episode, and Qwen3.5's linear-attention layers are slower than the attention in Qwen3-VL, so on RoboRewardBench we take 279 ms per episode against 142–160 ms for a single RoboReward forward pass.
+- **Calibration degrades outside robotics**: on general decision questions accuracy roughly holds at the level of the JevAny-Qwen3.5-4B starting point, but the probabilities become overconfident. For general use, take [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA) itself.
 
-## Behind the 27B on success detection and preference
-
-On success detection and trajectory preference in JevAny-Robotics-Public, OneJev-27B is better. And two of the five success sets have their train split in our training data, so this number is biased in our favor.
-
-## Slower than RoboReward
-
-Full media means more tokens per episode, and Qwen3.5's linear-attention layers are slower than the attention in Qwen3-VL, so on RoboRewardBench we take 279 ms per episode against 142–160 ms for a single RoboReward forward pass.
-
-## Calibration degrades outside robotics
-
-On general decision questions accuracy roughly holds at the level of the JevAny-4B starting point, but the probabilities become overconfident. For general use, take JevAny-4B itself.
-
-## Clues from a second training round
+# 8 Clues from a second training round
 
 Can the weaknesses be fixed with data? We ran one round of continued training (internally v0.3.1): starting from the model in this post, we added 22,051 new real-robot questions (AIRoA, AgiBot, RoboCOIN, RoboMIND, RH20T) and replayed part of the old data. Some things went up and some went down.
 
@@ -159,19 +152,19 @@ Can the weaknesses be fixed with data? We ran one round of continued training (i
 
 The two-view gain is the largest, but its confidence interval just touches 0, and it comes mostly from one family of constructed questions (AIRoA's reversed actions). Three-view gets worse, consistent with RH20T's constructed questions going the wrong way on the dev set as training proceeds. Single-view gets significantly worse. Failure and success questions get significantly better. At the default threshold, the continued model calls 87.5% of questions "rising".
 
-So we are still releasing the model in this post. What the extra round shows is that more data can move a capability onto a specific weakness, but gains from constructed questions do not necessarily transfer, and they can make other views worse. Next we plan to use real failures and real regressions (rather than reversed playback or reversed actions), add more truncated clips, and replay all of the RoboRewardBench-style scoring questions. If you have annotated real-robot rollouts, we would love to hear from you.
+So we are still releasing the model in this post. What the extra round shows is that more data can move a capability onto a specific weakness, but gains from constructed questions do not necessarily transfer, and they can make other views worse.
 
-# Experimental details
+# 9 Experimental details
 
-**One harness.** Every model runs in our harness, with identical questions and media, and every model answered every question. Confidence intervals are 95% intervals from a paired cluster bootstrap (resampling by episode or task group). Test sets: RoboPulse 1,800 pairs, RoboPulse++ 7,720 pairs, RoboRewardBench 2,831 episodes (checked item by item against the test split of teetone/RoboReward on the Hub), and the 13 question types of JevAny-Robotics-Public.
+**One harness.** Every model runs in our harness, with identical questions and media, and every model answered every question. Confidence intervals are 95% intervals from a paired cluster bootstrap (resampling by episode or task group). Test sets: RoboPulse 1,800 pairs, RoboPulse++ 7,720 pairs, RoboRewardBench 2,831 episodes (checked item by item against the test split of [teetone/RoboReward](https://huggingface.co/datasets/teetone/RoboReward) on the Hub), and the 13 question types of JevAny-Robotics-Public.
 
 **How the specialists answer questions they were not trained on.** All of the rules below were fixed before scoring.
 
 - RoboReward: whole-episode 1–5 scoring only. For pairwise questions, we take the expected score of (before, after) minus that of (after, before). It was not trained to judge pairs, so scoring near chance on RoboPulse does not mean it cannot judge progress.
 - Robometer: debiased frame-level progress; the 1–5 cut points for RoboRewardBench are fitted on val.
-- Robo-Dopamine: we replicate GRMInference from PRM-as-a-Judge (vLLM). On RoboPulse++ we fixed incremental as the primary readout and also report forward and position-bias-removed variants; the reference start is the first frame of the episode, and a blank image is used when there is no goal image. RoboRewardBench, policy ranking, and the success questions use first-to-last-frame progress, with cut points fitted on RoboReward val; the fitted cut points are such that it never predicts a 5. The 146 requests out of 23,559 that exceeded 8,192 tokens were rerun with images scaled to ≤ 76,800 pixels.
+- Robo-Dopamine: we replicate GRMInference from [PRM-as-a-Judge](https://arxiv.org/abs/2603.21669) (vLLM). On RoboPulse++ we fixed incremental as the primary readout and also report forward and position-bias-removed variants; the reference start is the first frame of the episode, and a blank image is used when there is no goal image. RoboRewardBench, policy ranking, and the success questions use first-to-last-frame progress, with cut points fitted on RoboReward val; the fitted cut points are such that it never predicts a 5. The 146 requests out of 23,559 that exceeded 8,192 tokens were rerun with images scaled to ≤ 76,800 pixels.
 
-**RoboReward's numbers do not match the leaderboard.** We measure MAE 0.358 / 0.407 for RoboReward-8B / 4B, while the paper and leaderboard report 0.665 / 0.845. The test set is the same; free generation and prefilled readout give 0.357 and 0.358; zero-shot Qwen3-VL-4B is 0.939 for us against 1.032 in the paper. An independent effort, RoboRMBench, also reports much lower RoboReward error than the leaderboard. We could not obtain the leaderboard's evaluation setup, so this post reports only our own measurements and does not compare against it.
+**RoboReward's numbers do not match the leaderboard.** We measure MAE 0.358 / 0.407 for RoboReward-8B / 4B, while the paper and leaderboard report 0.665 / 0.845. The test set is the same; free generation and prefilled readout give 0.357 and 0.358; zero-shot Qwen3-VL-4B is 0.939 for us against 1.032 in the paper. An independent effort, [RoboRMBench](https://arxiv.org/abs/2609.05401), also reports much lower RoboReward error than the leaderboard. We could not obtain the leaderboard's evaluation setup, so this post reports only our own measurements and does not compare against it.
 
 **Robo-Dopamine overlap check.** Using our decontamination of the GRM data, we mark the RoboPulse questions that overlap with GRM episodes (861 / 1,800). Overlapping questions are easier for every model, by about 5 points; the numbers above are on the non-overlapping subset.
 
@@ -181,7 +174,7 @@ So we are still releasing the model in this post. What the extra round shows is 
 
 **Speed.** One A100-40GB, batch 1, median end-to-end latency. All accuracies in this post use the PyTorch reference kernel; with flash-linear-attention + causal-conv1d they are unchanged within numerical error (RoboPulse 71.4%, RoboRewardBench MAE 0.446). The 27B models run the reference kernel across 2 GPUs.
 
-# How to use it
+# 10 How to use it
 
 The model is on Hugging Face: [SimpleJev/JevAny-Robotics-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA). The evaluation set: [SimpleJev/JevAny-Robotics-Public](https://huggingface.co/datasets/SimpleJev/JevAny-Robotics-Public). The code: [SimpleJev/JevAny](https://github.com/SimpleJev/JevAny).
 
@@ -191,20 +184,26 @@ If you use it for a binary decision (say, whether progress is rising), set the t
 
 # References
 
-1\. RoboPulse. arXiv:2603.21669.
+1\. Ji, Y., Liu, Y., Tan, H., et al. *PRM-as-a-Judge: A Dense Evaluation Paradigm for Fine-Grained Robotic Auditing*. arXiv:2603.21669, 2026. Introduces RoboPulse. [https://arxiv.org/abs/2603.21669](https://arxiv.org/abs/2603.21669)
 
-2\. RoboPulse++. arXiv:2608.14284.
+2\. Lee, T., Wagenmaker, A., Pertsch, K., et al. *RoboReward: General-Purpose Vision-Language Reward Models for Robotics*. arXiv:2601.00675, 2026. Introduces RoboReward, RoboRewardBench, and RoboArena. [https://arxiv.org/abs/2601.00675](https://arxiv.org/abs/2601.00675)
 
-3\. RoboReward: RoboReward and RoboRewardBench. arXiv:2601.00675.
+3\. Tan, H., Chen, S., Xu, Y., et al. *Robo-Dopamine: General Process Reward Modeling for High-Precision Robotic Manipulation*. arXiv:2512.23703, 2025. [https://arxiv.org/abs/2512.23703](https://arxiv.org/abs/2512.23703)
 
-4\. Robometer. arXiv:2603.02115.
+4\. Pacaud, P., Garcia, R., Chen, S., & Schmid, C. *Guardian: Detecting Robotic Planning and Execution Errors with Vision-Language Models*. arXiv:2512.01946, 2025. [https://arxiv.org/abs/2512.01946](https://arxiv.org/abs/2512.01946)
 
-5\. Robo-Dopamine. arXiv:2512.23703; Robo-Dopamine 2.0. arXiv:2608.15680.
+5\. Fang, Y., Dong, W., Liu, J., et al. *DenseReward: Dense Reward Learning via Failure Synthesis for Robotic Manipulation*. arXiv:2607.13033, 2026. [https://arxiv.org/abs/2607.13033](https://arxiv.org/abs/2607.13033)
 
-6\. RoboRMBench. arXiv:2609.05401.
+6\. Ye, Z., Lu, W., Ye, M., et al. *RoboFAC: A Comprehensive Framework for Robotic Failure Analysis and Correction*. arXiv:2505.12224, 2025. [https://arxiv.org/abs/2505.12224](https://arxiv.org/abs/2505.12224)
 
-7\. PRM-as-a-Judge (Robo-Dopamine inference code).
+7\. Zeng, X., Zhou, X., Li, Y., et al. *Diagnose, Correct, and Learn from Manipulation Failures via Visual Symbols*. arXiv:2512.02787, 2025. Introduces ViFailback. [https://arxiv.org/abs/2512.02787](https://arxiv.org/abs/2512.02787)
 
-8\. JevAny-Robotics-4B-LoRA model card. [https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA)
+8\. Sermanet, P., Ding, T., Zhao, J., et al. *RoboVQA: Multimodal Long-Horizon Reasoning for Robotics*. arXiv:2311.00899, 2023. [https://arxiv.org/abs/2311.00899](https://arxiv.org/abs/2311.00899)
 
-9\. JevAny. [https://github.com/SimpleJev/JevAny](https://github.com/SimpleJev/JevAny)
+9\. Xu, Y., Jin, H., Zhou, R., et al. *Robo-Dopamine 2.0: History-Conditioned and OOD-Aware Process Reward Modeling for Robotic Manipulation*. arXiv:2608.15680, 2026. [https://arxiv.org/abs/2608.15680](https://arxiv.org/abs/2608.15680)
+
+10\. Liang, A., Korkmaz, Y., Zhang, J., et al. *Robometer: Scaling General-Purpose Robotic Reward Models via Trajectory Comparisons*. arXiv:2603.02115, 2026. [https://arxiv.org/abs/2603.02115](https://arxiv.org/abs/2603.02115)
+
+11\. Liu, Y., Shen, Y., Chen, R., et al. *PRM-as-a-Judge 1.5: A Toolkit for Robot Process Assessment*. arXiv:2608.14284, 2026. Introduces RoboPulse++. [https://arxiv.org/abs/2608.14284](https://arxiv.org/abs/2608.14284)
+
+12\. Jeung, W., Yoon, S., Hong, H., et al. *Same Trajectory, Contradictory Rewards (RoboRMBench): Paraphrase Fragility in Vision Language Reward Models*. arXiv:2609.05401, 2026. [https://arxiv.org/abs/2609.05401](https://arxiv.org/abs/2609.05401)

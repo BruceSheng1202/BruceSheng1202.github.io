@@ -1,12 +1,14 @@
+<p class="post-links"><strong>模型</strong> <a href="https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA">JevAny-Robotics-4B-LoRA</a><span class="sep">·</span><strong>评测集</strong> <a href="https://huggingface.co/datasets/SimpleJev/JevAny-Robotics-Public">JevAny-Robotics-Public</a><span class="sep">·</span><strong>代码</strong> <a href="https://github.com/SimpleJev/JevAny">SimpleJev/JevAny</a></p>
+
 决策模型（Jev 式、System One）回答问题的方式和生成式模型不同：给它一个状态和一组选项，它一次前向就给出每个选项的概率，不生成文本。我们想知道，只用公开数据和我们的训练方法，这样一个 4B 的决策模型在机器人操作的评判上能做到什么程度。
 
-# 结论
+# 1 结论
 
-1. **公开数据就能把 4B 决策模型训得很强。** 在 RoboPulse、RoboRewardBench 和人工打分的真机 rollout（RoboArena）上，它超过我们测过的所有多模态 Jev 式模型，包括 27B 的；RoboPulse++ 和给策略排序上与 27B 打平。专用的机器人奖励模型在各自的主场仍然更强：Robo-Dopamine 在细粒度进度判断上（RoboPulse 90% 对 71%），RoboReward 在 1–5 打分上（MAE 0.358 对 0.443）。
+1. **公开数据就能把 4B 决策模型训得很强。** 在 [RoboPulse](https://arxiv.org/abs/2603.21669)、[RoboRewardBench](https://arxiv.org/abs/2601.00675) 和人工打分的真机 rollout（RoboArena）上，它超过我们测过的所有多模态 Jev 式模型，包括 27B 的；RoboPulse++ 和给策略排序上与 27B 打平。专用的机器人奖励模型在各自的主场仍然更强：Robo-Dopamine 在细粒度进度判断上（RoboPulse 90% 对 71%），RoboReward 在 1–5 打分上（MAE 0.358 对 0.443）。
 2. **它的概率可信，也快。** RoboRewardBench 上它的 NLL 是所有测过的模型里最低的（1.02，RoboReward-8B 1.39）；单张 A100 上每次判断 185 ms，Robo-Dopamine-8B 316 ms，27B judge 用两张卡也要 732–838 ms。
 3. **短板清楚，而且看起来能补。** 细粒度进度、RoboRewardBench 的合成题、多相机视角是它最弱的地方。加 2.2 万道新真机题续训后，两相机进度的 AUROC 从 0.65 升到 0.77（置信区间刚好碰到 0），但单视角变差，整体差不多持平，所以发布版仍是第一版（v0.2）。
 
-# 一个模型，回答一段 rollout 的所有问题
+# 2 一个模型，回答一段 rollout 的所有问题
 
 给它一段机器人 rollout 和一个问题，它对每个可能的答案给出概率。一段 rollout 上你会问的问题，它都能回答：
 
@@ -24,19 +26,19 @@
 
 ***图 1** 两段 RoboArena 真机 rollout（RoboRewardBench 的 RoboArena 子集，DROID 平台）的逐帧打分：对视频的每个前缀问“如果在这里结束，任务完成得怎么样（1–5）”，曲线是期望分。两段都选自模型最终分数和人工打分一致的例子。*
 
-# 决策模型一次前向就给出所有选项的概率
+# 3 一次前向给出所有选项的概率
 
 每道题由状态（任务指令、图像或视频）和一个带类型的问题组成：是非题、多选题或 1–5 打分题，选项和判分标准都写在题里。模型把状态和所有选项一起编码，由 pointer head 在选项上打分，直接输出一个概率分布，不逐词生成。
 
 这带来两个对机器人评判很有用的性质。一是选项再多也只算一次，延迟不随答案长度增长。二是输出本身就是概率，可以直接当奖励信号、拿来筛数据，或者按置信度决定什么时候交给人复核。
 
-JevAny-Robotics-4B 从我们开源的 JevAny-Qwen3.5-4B-LoRA 热启动。后者在通用决策数据上训练过，底座是 Qwen3.5-4B。我们只训 LoRA（r = 8，共 1,760 万可训练参数）和 pointer head：一个 epoch、5,780 步、全局 batch 32、学习率 1e-5，在 4 张 A100-40GB 上约 13–14 小时。图像用原分辨率；视频先重采样成约 1–2 fps、8–32 帧的短片，再全部帧输入。
+JevAny-Robotics-4B 从我们开源的 [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA) 热启动。后者在通用决策数据上训练过，底座是 Qwen3.5-4B。我们只训 LoRA（r = 8，共 1,760 万可训练参数）和 pointer head：一个 epoch、5,780 步、全局 batch 32、学习率 1e-5，在 4 张 A100-40GB 上约 13–14 小时。图像用原分辨率；视频先重采样成约 1–2 fps、8–32 帧的短片，再全部帧输入。
 
-# 训练数据只来自公开数据集的 train split
+# 4 训练数据只来自公开数据集的 train split
 
 我们想回答的问题是：不采新数据、不做人工标注，只把现有公开数据改写成决策题，能把一个 4B 模型训到什么程度。
 
-来源是 RoboReward、Robo-Dopamine GRM、Guardian（BDV2 / RLBench）、DenseReward、RoboFAC、ViFailback 和 RoboVQA 的 train split，涵盖真机和仿真、图像和视频。每个来源原本的标签形式不同：整段 1–5 分、帧级进度、成败标签、失败类型、规划是否正确。我们把它们统一改写成 7 类题：成对进度、相邻帧方向、1–5 打分、执行成败、失败类型与规划检查、失败定位、轨迹偏好，共 184,942 道（图 2）。
+来源是 [RoboReward](https://arxiv.org/abs/2601.00675)、[Robo-Dopamine GRM](https://arxiv.org/abs/2512.23703)、[Guardian](https://arxiv.org/abs/2512.01946)（BDV2 / RLBench）、[DenseReward](https://arxiv.org/abs/2607.13033)、[RoboFAC](https://arxiv.org/abs/2505.12224)、[ViFailback](https://arxiv.org/abs/2512.02787) 和 [RoboVQA](https://arxiv.org/abs/2311.00899) 的 train split，涵盖真机和仿真、图像和视频。每个来源原本的标签形式不同：整段 1–5 分、帧级进度、成败标签、失败类型、规划是否正确。我们把它们统一改写成 7 类题：成对进度、相邻帧方向、1–5 打分、执行成败、失败类型与规划检查、失败定位、轨迹偏好，共 184,942 道（图 2）。
 
 ![Training data pipeline](img/figure-002.png)
 
@@ -48,9 +50,9 @@ JevAny-Robotics-4B 从我们开源的 JevAny-Qwen3.5-4B-LoRA 热启动。后者�
 
 训练集 JevAny-Robotics-Train-v0.2 还在确认部分来源的再发布许可，确认后公开。
 
-# 公开数据能把 4B 训到哪里：超过其他多模态 Jev 类模型，专用模型仍守住自己的主场
+# 5 公开数据能把 4B 训到哪里
 
-我们把 8 个模型放进同一套 harness，题目和媒体完全相同。一边是支持多模态的 Jev 类决策模型：JevAny-27B、OneJev-27B、OmniJev-4B；另一边是专门为机器人训练的奖励模型：Robo-Dopamine-GRM-2.0-8B、RoboReward-8B / 4B、Robometer-4B（图 3）。
+我们把 8 个模型放进同一套 harness，题目和媒体完全相同。一边是支持多模态的 Jev 类决策模型：JevAny-27B、OneJev-27B、OmniJev-4B；另一边是专门为机器人训练的奖励模型：[Robo-Dopamine-GRM-2.0-8B](https://arxiv.org/abs/2608.15680)、RoboReward-8B / 4B、[Robometer-4B](https://arxiv.org/abs/2603.02115)（图 3）。
 
 ![Model comparison across seven benchmarks](img/figure-003.png)
 
@@ -70,7 +72,7 @@ JevAny-Robotics-4B 从我们开源的 JevAny-Qwen3.5-4B-LoRA 热启动。后者�
 
 ᵃ RoboReward 只做整段打分，成对题是我们改造的。ᵇ Robo-Dopamine 用首帧到末帧的进度当分数，切点在 val 上拟合。ᶜ 5 个集合里有 2 个的 train split 在我们的训练数据里。改造规则见「实验细节」。RoboReward-4B 和 OmniJev-4B 的数字见模型卡。
 
-和同类的多模态 Jev 类模型比，这个 4B 模型在 RoboPulse、RoboRewardBench 和 RoboArena 真机上都超过了参数量约为它 7 倍的 JevAny-27B 和 OneJev-27B。差距最大的是 RoboPulse：71.1% 对 56.6% 和 60.4%。RoboPulse++ 上我们的数字更高，但差距在置信区间内；策略排序上三者打平。成败判断和轨迹偏好上 OneJev-27B 仍然更好（AUROC 0.903 对 0.872，配对差 −0.031 \[−0.052, −0.012\]；偏好 0.836 对 0.771）。
+和同类的多模态 Jev 类模型比，这个 4B 模型在 RoboPulse、RoboRewardBench 和 RoboArena 真机上都超过了参数量约为它 7 倍的 JevAny-27B 和 OneJev-27B。差距最大的是 RoboPulse：71.1% 对 56.6% 和 60.4%。[RoboPulse++](https://arxiv.org/abs/2608.14284) 上我们的数字更高，但差距在置信区间内；策略排序上三者打平。成败判断和轨迹偏好上 OneJev-27B 仍然更好（AUROC 0.903 对 0.872，配对差 −0.031 \[−0.052, −0.012\]；偏好 0.836 对 0.771）。
 
 和专用奖励模型比，结论取决于题目是不是它们的主场。
 
@@ -80,7 +82,7 @@ JevAny-Robotics-4B 从我们开源的 JevAny-Qwen3.5-4B-LoRA 热启动。后者�
 
 我们的理解是，只用公开数据，一个小的决策模型可以做到什么题都答、每项都靠前；但在某一种固定格式上，专门为这种格式训练的模型仍然更强。
 
-# 概率可信，速度也快
+# 6 概率可信，速度也快
 
 奖励信号不只要判得对，还要知道自己什么时候不确定。RoboRewardBench 的每段视频都要在 1–5 分上给出分布，我们比较了所有能输出这个分布的模型（图 4）。
 
@@ -113,37 +115,28 @@ JevAny-Robotics-4B 从我们开源的 JevAny-Qwen3.5-4B-LoRA 热启动。后者�
 | RoboReward-8B，正常生成 | – | 361 ms |
 | 27B Jev 类模型，参考内核，2 卡 | 732–838 ms | – |
 
-我们比 Robo-Dopamine-8B 和 27B 模型都快，但在 RoboRewardBench 上比 RoboReward 慢。原因是我们按原分辨率、全部帧输入，每段视频的视觉 token 中位数是 1,433，是 RoboReward（564）的约 2.5 倍。把输入压到 JevAny 默认的 8 帧、512×512 总像素，延迟能降到 187 ms，但 RoboRewardBench MAE 从 0.443 涨到 0.607，RoboArena 从 0.687 涨到 1.289。所以这个模型一定要用全量媒体来跑。
+我们比 Robo-Dopamine-8B 和 27B 模型都快，但在 RoboRewardBench 上比 RoboReward 慢。原因是我们按原分辨率、全部帧输入，每段视频的视觉 token 中位数是 1,433，是 RoboReward（564）的约 2.5 倍。把输入压到 JevAny 默认的 8 帧、512×512 总像素，延迟能降到 187 ms，但 RoboRewardBench MAE 从 0.443 涨到 0.607，RoboArena 从 0.687 涨到 1.289。
 
-# 这些结论的边界
+# 7 这些结论的边界
 
-## 细粒度进度还差很远
+## 7.1 细粒度进度还差很远
 
 RoboPulse 上 71.1% 对 Robo-Dopamine 的 90.1%，是全文最大的差距。我们检查过这不是测试重叠造成的：只看 episode 不在 Robo-Dopamine 公开训练数据里的 939 题，它仍然是 87.5%，我们 68.8%。分来源看，它在全部 9 个来源上都领先。我们的理解是，小幅进度变化需要大量同格式的密集监督，而公开数据里这类题我们只用了一部分。
 
 RoboPulse++ 上还有一个阈值问题。训练时上升 / 下降是 1:1，测试里 81% 是上升。默认阈值 0.5 下准确率只有 60.4%，低于「全判上升」的 81.1%。排序质量（AUROC）和平衡准确率才是有意义的指标，实际用时应该在自己的数据上定阈值。
 
-## RoboRewardBench 的合成题
+## 7.2 RoboRewardBench 的合成题
 
 RoboRewardBench 的 OXE 部分有一批构造题：换掉任务指令的成功视频、从中间截断的视频。RoboReward 正是在同样构造的数据上训练的，在这两类题上明显更好（MAE 0.223 对 0.297、0.418 对 0.584）。我们常把截断视频判成「快做完了」。另外几个小子集（如 utokyo\_xarm\_bimanual、stanford\_hydra）误差很高，训练里这些子集的打分题只有几百道。
 
-## 多视角
+## 7.3 其他发现
 
-同时看 2–3 个相机的题仍是最弱的一类。RoboPulse++ 上，单视角 AUROC 0.758，两视角 0.646，三视角 0.672。
+- **多视角**：同时看 2–3 个相机的题仍是最弱的一类。RoboPulse++ 上，单视角 AUROC 0.758，两视角 0.646，三视角 0.672。
+- **成败判断和偏好**：JevAny-Robotics-Public 上 OneJev-27B 更好。而且 5 个成败集合里有 2 个的 train split 在我们的训练数据里，这一项对我们是偏有利的。
+- **速度**：全量媒体的代价是每段视频的 token 多，再加上 Qwen3.5 的线性注意力层比 Qwen3-VL 的注意力慢，所以 RoboRewardBench 上我们每段 279 ms，RoboReward 单次前向 142–160 ms。
+- **机器人之外的校准变差**：在通用决策题上，准确率大致保持在起点 JevAny-Qwen3.5-4B 的水平，但概率变得过度自信。通用场景请用 [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA) 本身。
 
-## 成败判断和偏好上不如 27B
-
-JevAny-Robotics-Public 的成败判断和轨迹偏好上，OneJev-27B 更好。而且 5 个成败集合里有 2 个的 train split 在我们的训练数据里，这一项对我们是偏有利的。
-
-## 速度不如 RoboReward
-
-全量媒体的代价是每段视频的 token 多，再加上 Qwen3.5 的线性注意力层比 Qwen3-VL 的注意力慢，所以 RoboRewardBench 上我们每段 279 ms，RoboReward 单次前向 142–160 ms。
-
-## 机器人之外的校准变差
-
-在通用决策题上，准确率大致保持在起点 JevAny-4B 的水平，但概率变得过度自信。通用场景请用 JevAny-4B 本身。
-
-## 第二轮训练的线索
+# 8 第二轮训练的线索
 
 这些弱点能不能靠数据补？我们做了一轮续训（内部叫 v0.3.1）：从本文的模型出发，加入 22,051 道新的真机题（AIRoA、AgiBot、RoboCOIN、RoboMIND、RH20T），并回放一部分旧数据。结果是有涨有跌。
 
@@ -159,19 +152,19 @@ JevAny-Robotics-Public 的成败判断和轨迹偏好上，OneJev-27B 更好。�
 
 两视角的提升最大，但置信区间刚好碰到 0，而且主要来自一类构造题（AIRoA 的反向动作）。三视角变差，和 RH20T 的构造题在开发集上越训越反一致。单视角显著变差。失败和成败类的题显著变好。默认阈值下，续训版把 87.5% 的题都判成上升。
 
-所以我们仍然发布本文的版本。这轮续训说明的是：加数据能把能力搬到特定的弱项上，但构造题带来的提升不一定能迁移，也可能让别的视角变差。下一步我们打算用真实的失败和下降（而不是倒放、反向动作构造的下降）、更多截断片段，并把 RoboRewardBench 型的打分题全量回放。如果你有带标注的真机 rollout，欢迎联系我们。
+所以我们仍然发布本文的版本。这轮续训说明的是：加数据能把能力搬到特定的弱项上，但构造题带来的提升不一定能迁移，也可能让别的视角变差。
 
-# 实验细节
+# 9 实验细节
 
-**同一套 harness。** 所有模型都在我们的 harness 里跑，题目和媒体完全相同，每个模型都答完了全部题。置信区间是配对 cluster bootstrap（按 episode 或 task group 重采样）的 95% 区间。测试集：RoboPulse 1,800 对，RoboPulse++ 7,720 对，RoboRewardBench 2,831 段（与 HF 上 teetone/RoboReward 的 test split 逐条核对一致），JevAny-Robotics-Public 13 个题型。
+**同一套 harness。** 所有模型都在我们的 harness 里跑，题目和媒体完全相同，每个模型都答完了全部题。置信区间是配对 cluster bootstrap（按 episode 或 task group 重采样）的 95% 区间。测试集：RoboPulse 1,800 对，RoboPulse++ 7,720 对，RoboRewardBench 2,831 段（与 HF 上 [teetone/RoboReward](https://huggingface.co/datasets/teetone/RoboReward) 的 test split 逐条核对一致），JevAny-Robotics-Public 13 个题型。
 
 **专用模型怎么答它们没被训练过的题。** 下面的规则都是打分前定下的。
 
 - RoboReward：只做整段 1–5 打分。成对题用两帧视频（前，后）的期望分减去（后，前）的期望分。它不是为成对判断训练的，所以 RoboPulse 上接近随机并不说明它不会判进度。
 - Robometer：用去偏后的逐帧进度；RoboRewardBench 的 1–5 切点在 val 上拟合。
-- Robo-Dopamine：复刻 PRM-as-a-Judge 的 GRMInference（vLLM）。RoboPulse++ 上事先定 incremental 为主读出，另报 forward 和去位置偏置两种；参考起点是 episode 第一帧，没有目标图时用空白图。RoboRewardBench、策略排序和成败题用首帧到末帧的进度，切点在 RoboReward val 上拟合，拟合出的切点让它从不预测 5 分。超过 8,192 token 的请求（23,559 个里有 146 个）把图像缩到 ≤ 76,800 像素后重跑。
+- Robo-Dopamine：复刻 [PRM-as-a-Judge](https://arxiv.org/abs/2603.21669) 的 GRMInference（vLLM）。RoboPulse++ 上事先定 incremental 为主读出，另报 forward 和去位置偏置两种；参考起点是 episode 第一帧，没有目标图时用空白图。RoboRewardBench、策略排序和成败题用首帧到末帧的进度，切点在 RoboReward val 上拟合，拟合出的切点让它从不预测 5 分。超过 8,192 token 的请求（23,559 个里有 146 个）把图像缩到 ≤ 76,800 像素后重跑。
 
-**RoboReward 的数字和榜单对不上。** 我们测得 RoboReward-8B / 4B 的 MAE 是 0.358 / 0.407，论文和榜单是 0.665 / 0.845。测试集是同一个；自由生成和预填读出分别是 0.357 和 0.358；零样本的 Qwen3-VL-4B 在我们这里是 0.939，论文是 1.032。另一篇独立工作 RoboRMBench 报告的 RoboReward 误差也远低于榜单。我们没能拿到榜单的评测设置，所以本文只报自己实测的数字，不和榜单比。
+**RoboReward 的数字和榜单对不上。** 我们测得 RoboReward-8B / 4B 的 MAE 是 0.358 / 0.407，论文和榜单是 0.665 / 0.845。测试集是同一个；自由生成和预填读出分别是 0.357 和 0.358；零样本的 Qwen3-VL-4B 在我们这里是 0.939，论文是 1.032。另一篇独立工作 [RoboRMBench](https://arxiv.org/abs/2609.05401) 报告的 RoboReward 误差也远低于榜单。我们没能拿到榜单的评测设置，所以本文只报自己实测的数字，不和榜单比。
 
 **Robo-Dopamine 的重叠检查。** 用我们对 GRM 数据做的去重结果，标出与 GRM episode 重叠的 RoboPulse 题（861 / 1,800）。重叠题对每个模型都更容易，大约高 5 个点，不重叠的结果见上文。
 
@@ -181,7 +174,7 @@ JevAny-Robotics-Public 的成败判断和轨迹偏好上，OneJev-27B 更好。�
 
 **速度。** 单张 A100-40GB、batch 1，端到端延迟取中位数。本文的准确率都用 PyTorch 参考内核算；换成 flash-linear-attention + causal-conv1d 后，准确率在数值误差范围内不变（RoboPulse 71.4%，RoboRewardBench MAE 0.446）。27B 模型用参考内核、分在 2 张卡上。
 
-# 怎么用
+# 10 怎么用
 
 模型在 Hugging Face 上：[SimpleJev/JevAny-Robotics-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA)。评测集：[SimpleJev/JevAny-Robotics-Public](https://huggingface.co/datasets/SimpleJev/JevAny-Robotics-Public)。代码：[SimpleJev/JevAny](https://github.com/SimpleJev/JevAny)。
 
@@ -191,20 +184,26 @@ JevAny-Robotics-Public 的成败判断和轨迹偏好上，OneJev-27B 更好。�
 
 # 参考文献
 
-1\. RoboPulse. arXiv:2603.21669.
+1\. Ji, Y., Liu, Y., Tan, H., et al. *PRM-as-a-Judge: A Dense Evaluation Paradigm for Fine-Grained Robotic Auditing*. arXiv:2603.21669, 2026. 提出 RoboPulse. [https://arxiv.org/abs/2603.21669](https://arxiv.org/abs/2603.21669)
 
-2\. RoboPulse++. arXiv:2608.14284.
+2\. Lee, T., Wagenmaker, A., Pertsch, K., et al. *RoboReward: General-Purpose Vision-Language Reward Models for Robotics*. arXiv:2601.00675, 2026. 提出 RoboReward、RoboRewardBench、RoboArena. [https://arxiv.org/abs/2601.00675](https://arxiv.org/abs/2601.00675)
 
-3\. RoboReward: RoboReward 与 RoboRewardBench. arXiv:2601.00675.
+3\. Tan, H., Chen, S., Xu, Y., et al. *Robo-Dopamine: General Process Reward Modeling for High-Precision Robotic Manipulation*. arXiv:2512.23703, 2025. [https://arxiv.org/abs/2512.23703](https://arxiv.org/abs/2512.23703)
 
-4\. Robometer. arXiv:2603.02115.
+4\. Pacaud, P., Garcia, R., Chen, S., & Schmid, C. *Guardian: Detecting Robotic Planning and Execution Errors with Vision-Language Models*. arXiv:2512.01946, 2025. [https://arxiv.org/abs/2512.01946](https://arxiv.org/abs/2512.01946)
 
-5\. Robo-Dopamine. arXiv:2512.23703；Robo-Dopamine 2.0. arXiv:2608.15680.
+5\. Fang, Y., Dong, W., Liu, J., et al. *DenseReward: Dense Reward Learning via Failure Synthesis for Robotic Manipulation*. arXiv:2607.13033, 2026. [https://arxiv.org/abs/2607.13033](https://arxiv.org/abs/2607.13033)
 
-6\. RoboRMBench. arXiv:2609.05401.
+6\. Ye, Z., Lu, W., Ye, M., et al. *RoboFAC: A Comprehensive Framework for Robotic Failure Analysis and Correction*. arXiv:2505.12224, 2025. [https://arxiv.org/abs/2505.12224](https://arxiv.org/abs/2505.12224)
 
-7\. PRM-as-a-Judge（Robo-Dopamine 推理代码）.
+7\. Zeng, X., Zhou, X., Li, Y., et al. *Diagnose, Correct, and Learn from Manipulation Failures via Visual Symbols*. arXiv:2512.02787, 2025. 提出 ViFailback. [https://arxiv.org/abs/2512.02787](https://arxiv.org/abs/2512.02787)
 
-8\. JevAny-Robotics-4B-LoRA 模型卡. [https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA)
+8\. Sermanet, P., Ding, T., Zhao, J., et al. *RoboVQA: Multimodal Long-Horizon Reasoning for Robotics*. arXiv:2311.00899, 2023. [https://arxiv.org/abs/2311.00899](https://arxiv.org/abs/2311.00899)
 
-9\. JevAny. [https://github.com/SimpleJev/JevAny](https://github.com/SimpleJev/JevAny)
+9\. Xu, Y., Jin, H., Zhou, R., et al. *Robo-Dopamine 2.0: History-Conditioned and OOD-Aware Process Reward Modeling for Robotic Manipulation*. arXiv:2608.15680, 2026. [https://arxiv.org/abs/2608.15680](https://arxiv.org/abs/2608.15680)
+
+10\. Liang, A., Korkmaz, Y., Zhang, J., et al. *Robometer: Scaling General-Purpose Robotic Reward Models via Trajectory Comparisons*. arXiv:2603.02115, 2026. [https://arxiv.org/abs/2603.02115](https://arxiv.org/abs/2603.02115)
+
+11\. Liu, Y., Shen, Y., Chen, R., et al. *PRM-as-a-Judge 1.5: A Toolkit for Robot Process Assessment*. arXiv:2608.14284, 2026. 提出 RoboPulse++. [https://arxiv.org/abs/2608.14284](https://arxiv.org/abs/2608.14284)
+
+12\. Jeung, W., Yoon, S., Hong, H., et al. *Same Trajectory, Contradictory Rewards (RoboRMBench): Paraphrase Fragility in Vision Language Reward Models*. arXiv:2609.05401, 2026. [https://arxiv.org/abs/2609.05401](https://arxiv.org/abs/2609.05401)

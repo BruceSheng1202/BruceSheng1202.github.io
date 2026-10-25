@@ -244,7 +244,7 @@ If you use it for a binary decision (say, whether progress is rising), set the t
 
 这带来两个对机器人评判很有用的性质。一是选项再多也只算一次，延迟不随答案长度增长。二是输出本身就是概率，可以直接当奖励信号、拿来筛数据，或者按置信度决定什么时候交给人复核。
 
-JevAny-Robotics-4B 从我们开源的 [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA) 热启动。后者在通用决策数据上训练过，底座是 Qwen3.5-4B。我们只训 LoRA（r = 8，共 1,760 万可训练参数）和 pointer head：一个 epoch、5,780 步、全局 batch 32、学习率 1e-5，在 4 张 A100-40GB 上约 13–14 小时。图像用原分辨率；视频先重采样成约 1–2 fps、8–32 帧的短片，再全部帧输入。
+[JevAny-Robotics-4B](https://huggingface.co/SimpleJev/JevAny-Robotics-4B-LoRA) 从我们开源的 [JevAny-Qwen3.5-4B-LoRA](https://huggingface.co/SimpleJev/JevAny-Qwen3.5-4B-LoRA) 热启动。后者在通用决策数据上训练过，底座是 Qwen3.5-4B。我们只训 LoRA（r = 8，共 1,760 万可训练参数）和 pointer head：一个 epoch、5,780 步、全局 batch 32、学习率 1e-5，在 4 张 A100-40GB 上约 13–14 小时。图像用原分辨率；视频先重采样成约 1–2 fps、8–32 帧的短片，再全部帧输入。
 
 # 4 训练数据只来自公开数据集的 train split
 

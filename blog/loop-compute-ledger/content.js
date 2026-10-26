@@ -197,8 +197,21 @@
 
   var bib = '@misc{sheng2026loop,\n  author = {Sheng, Huanxin},\n  title = {Accounting for Compute in a Looped Model},\n  year = {2026},\n  month = oct,\n  url = {https://brucesheng1202.github.io/blog/loop-compute-ledger/},\n  note = {Blog post}\n}';
 
-  var lang = new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en';
+  var storedLang = null;
+  try { storedLang = localStorage.getItem('blog-lang'); } catch (e) {}
+  var queryLang = new URLSearchParams(location.search).get('lang');
+  var lang = (queryLang === 'zh' || queryLang === 'en')
+    ? queryLang
+    : (storedLang === 'zh' ? 'zh' : 'en');
   var frame = 0;
+
+  function syncLang() {
+    try { localStorage.setItem('blog-lang', lang); } catch (e) {}
+    var url = new URL(location.href);
+    if (url.searchParams.get('lang') === lang) return;
+    url.searchParams.set('lang', lang);
+    history.replaceState(null, '', url);
+  }
 
   function applyText() {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
@@ -350,9 +363,7 @@
       var next = button.getAttribute('data-lang') === 'zh' ? 'zh' : 'en';
       if (next === lang) return;
       lang = next;
-      var url = new URL(location.href);
-      url.searchParams.set('lang', lang);
-      history.replaceState(null, '', url);
+      syncLang();
       render();
     });
   });
@@ -394,5 +405,6 @@
 
   window.addEventListener('scroll', function () { spy(); scheduleLayout(); }, { passive: true });
   window.addEventListener('resize', scheduleLayout);
+  syncLang();
   render();
 })();

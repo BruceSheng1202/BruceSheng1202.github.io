@@ -1,7 +1,7 @@
 (function () {
   var EN = {
     't-outline': 'On this page',
-    't-eyebrow': 'Research note · October 2026',
+    't-eyebrow': 'Research note · October 23, 2026',
     't-title': 'Accounting for Compute in a Looped Model',
     't-dek': 'A looped language model reuses the same block of layers. The parameter count stays fixed while the computation can be made deeper, one pass at a time. Training is expensive: the Parcae recipe runs about eight loops per sample on average. We trained more than sixty small models on a 5090 24G to see how many of those loops are actually doing work, and what the saved compute can buy.',
     't-meta': '86.5M and 144M parameters · at most 2B training tokens · FineWeb-Edu',

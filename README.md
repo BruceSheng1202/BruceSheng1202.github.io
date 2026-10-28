@@ -18,6 +18,10 @@ Welcome! 👋 This repo hosts my academic homepage and research blog.
 
 ## Latest Blog
 
+- **Oct 2026** — [Generative Judges Before Jev, and a Meta-Harness for a 4B Judge](https://brucesheng1202.github.io/blog/judge-meta-harness/?lang=en)
+  Twenty-one generative judges on three rubric benchmarks, set against the decision model Jev 1.13; then an automated harness search that moves a 4B judge from 61.11 to 72.58 test MF1 on HealthBench meta-evaluation.
+- **Oct 2026** — [Accounting for Compute in a Looped Model](https://brucesheng1202.github.io/blog/loop-compute-ledger/?lang=en)
+  The Parcae recipe averages eight loops, but the first four already collect 94% of the gain. I trained 60+ small models on a single RTX 5090 to see how much of that compute is actually necessary.
 - **Jul 2026** — [On-Policy Distillation: Discussion of Loss Design](https://brucesheng1202.github.io/blog/opd-loss-design/?lang=en)
   A practical guide to choosing an OPD objective: reverse KL, better estimators, Top-K truncation, and why representation distillation still struggles on-policy.
 

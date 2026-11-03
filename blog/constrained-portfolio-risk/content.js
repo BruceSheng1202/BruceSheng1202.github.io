@@ -1,5 +1,13 @@
 window.POST_CONTENT = {
-  en: String.raw`Fit a minimum-variance portfolio on a year of daily returns and the optimizer tells you how risky the portfolio is. That number is too low, often by a lot. In one of the examples below — 500 stocks, 250 days, short sales banned — the optimizer reports about one eighteenth of the variance the portfolio actually carries.
+  en: String.raw`<div class="editor-note">
+<p class="editor-note-label">Editor's note</p>
+<p>Three years ago I was still doing high-dimensional constrained portfolio work in MATLAB and R. The code is in <a href="https://github.com/microfan1/CROWN">CROWN</a>, the paper came out in <a href="https://www.tandfonline.com/doi/full/10.1080/01621459.2025.2602832">JASA</a>, and the Misc section of my homepage still mentions it. What I was reading at the time was a printout a senior student handed me: Jianqing Fan's <a href="https://www.taylorfrancis.com/books/mono/10.1201/9780429096280/statistical-foundations-data-science-jianqing-fan-runze-li-cun-hui-zhang-hui-zou">Statistical Foundations of Data Science</a>. Before graduating I helped proofread its Chinese translation, which is now <a href="http://fj.tsxcfw.com/bookshow.asp?id=3230017">in print</a>.</p>
+<p>LLM agents are strong at mathematics and code, work like this needs no multi-GPU cluster, and I am still learning the same advanced statistics. So a question kept nagging: can the strongest AI write a paper good enough for one of the four top statistics journals?</p>
+<p>Taking the high-dimensional portfolio problem as the topic, I wrote my requirements out as a prompt and let Claude Opus 5.5 Max run in autoresearch mode. Within a day it produced a paper, presented here as a blog post. I rarely adjusted the agent's behaviour or decisions: the idea, the experiments, the paper and this blog post were all written by Claude. I only did a rough review and proofread, so I will not claim the contribution as mine.</p>
+<p>The study looks plausible, but I cannot vouch for whether it has real research or practical value. What bothers me more is something else: if a study like this can appear in a day, could one determined person submit to a top statistics journal every day, and would the review system buckle under the load? As human experts find it harder to keep up with AI-generated work, how to separate validity from contribution and decide acceptance is the question this post left me with.</p>
+</div>
+
+Fit a minimum-variance portfolio on a year of daily returns and the optimizer tells you how risky the portfolio is. That number is too low, often by a lot. In one of the examples below — 500 stocks, 250 days, short sales banned — the optimizer reports about one eighteenth of the variance the portfolio actually carries.
 
 The reason is the same one that makes training error lower than test error. The covariance matrix is estimated from the same data the optimizer uses to pick the weights, and the optimizer is very good at finding combinations whose risk the sample happens to underestimate. Without constraints the size of this gap has been known for a long time. Real portfolios are constrained — no short sales, position limits, sector bounds, tracking-error budgets — and once a constraint binds, the classical formula no longer applies.
 
@@ -161,7 +169,15 @@ Where the floor lies below the target in most windows, the calibrated portfolio 
 11\. De Nard, G., Ledoit, O., and Wolf, M. (2025). Improved Tracking-Error Management for Active and Passive Investing. The Journal of Portfolio Management. [https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf](https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf)
 
 12\. skfolio-datasets: datasets distributed with the skfolio library (NASDAQ daily prices). [https://github.com/skfolio/skfolio-datasets](https://github.com/skfolio/skfolio-datasets)`,
-  zh: String.raw`用一年的日收益率算一个最小方差组合，优化器会顺便告诉你这个组合的风险有多大。这个数是偏低的，而且常常低得离谱。后面有个例子：500 只股票、250 天数据、禁止卖空，优化器报出来的方差只有组合实际方差的约 1/18。这个例子后面还会回来。
+  zh: String.raw`<div class="editor-note">
+<p class="editor-note-label">编者按</p>
+<p>三年前我还在用 MATLAB 和 R 做高维带约束的投资组合，代码在 <a href="https://github.com/microfan1/CROWN">CROWN</a>，论文后来发在 <a href="https://www.tandfonline.com/doi/full/10.1080/01621459.2025.2602832">JASA</a>；主页的 Misc 里还留着这段经历。当时翻的是学长打印出来的范剑青《<a href="https://www.taylorfrancis.com/books/mono/10.1201/9780429096280/statistical-foundations-data-science-jianqing-fan-runze-li-cun-hui-zhang-hui-zou">数据科学统计基础</a>》，毕业前我帮忙校对了这本书的中译本，<a href="http://fj.tsxcfw.com/bookshow.asp?id=3230017">译本</a>已经出版。</p>
+<p>LLM agents 在数学和代码上已经这么强，这边做研究又不需要多卡 GPU，而我还在学这些高等统计学，于是不免好奇：最强的 AI 能不能写出一篇合格的统计四大顶刊论文，从 idea 到成稿？</p>
+<p>顺着高维统计组合这个题目，我把要求写成 prompt，让 Claude Opus 5.5 Max 在 autoresearch 模式下跑，一天之内就产出了一篇论文，并以 blog 的形式放在这里。整个过程我很少干预它的行为和决定：idea、实验、论文、乃至这篇 blog 都是它写的，我只做了粗略的审核和校对，所以不愿意把这份 contribution 算在自己头上。</p>
+<p>这项研究看起来像那么一回事，但我很难保证它真的有研究价值和实用价值。更让我在意的是另一件事：如果一天就能产出这样一项研究，是不是一个"卷王"可以一天投一篇统计顶刊，审稿系统很快就会承受不住？当人类专家越来越难应对 AI 生成的研究成果，怎么分辨一篇论文的 validity 和 contribution、并据此决定 accept 还是 reject，是我写这篇 blog 时真正好奇的研究问题。</p>
+</div>
+
+用一年的日收益率算一个最小方差组合，优化器会顺便告诉你这个组合的风险有多大。这个数是偏低的，而且常常低得离谱。后面有个例子：500 只股票、250 天数据、禁止卖空，优化器报出来的方差只有组合实际方差的约 1/18。这个例子后面还会回来。
 
 原因和"训练误差总比测试误差好看"是一回事。协方差矩阵是用数据估出来的，优化器又用同一份数据去挑权重，它特别擅长找到那些"在这份样本里风险恰好被低估"的组合。不加约束时，这个差距有多大早就算清楚了。可实际的组合都有约束：禁止卖空、单只上限、行业比例、跟踪误差预算。约束一旦顶住，经典公式就不再适用。
 

@@ -56,6 +56,10 @@ a { color: var(--blue); }
 .article h1#references ~ p { margin: .85rem 0; padding-left: 1.6rem; text-indent: -1.6rem; color: #4d576b; font: .84rem/1.62 var(--sans); }
 .article h2 { margin: 2.2em 0 .65em; font-size: 1.5rem; }
 .article p { margin: 1em 0; text-wrap: pretty; }
+.editor-note { margin: 1.4rem 0 2.4rem; padding: 2px 0 2px 18px; border-left: 3px solid rgba(102, 112, 133, .28); color: var(--muted); font-size: .94rem; line-height: 1.78; }
+.editor-note p { margin: .55em 0; text-wrap: pretty; }
+.editor-note p.editor-note-label { margin: 0 0 .5rem; color: #98a2b3; font: 700 .72rem/1 var(--sans); letter-spacing: .16em; }
+.editor-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
 .article li { text-wrap: pretty; }
 .article li { margin: .35em 0; }
 .article blockquote { margin: 1.7em 0; padding: 2px 0 2px 22px; border-left: 3px solid var(--blue); color: var(--muted); }

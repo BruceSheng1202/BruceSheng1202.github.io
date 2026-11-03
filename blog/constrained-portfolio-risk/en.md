@@ -24,7 +24,7 @@ A minimum-variance optimizer does this on a much larger scale. It does not only 
 
 Without constraints the damage is known precisely. The in-sample variance is too low by a factor of about 1 − p/n ([El Karoui, 2010](https://arxiv.org/abs/1211.2917)), and the variance you actually bear is too high by about 1/(1 − p/n), so the two differ by about (1 − p/n)<sup>−2</sup>. Dividing by that factor was proposed as a correction for risk forecasts ([Shepard, 2009](https://arxiv.org/abs/0908.2455)). At p/n = 0.4 the gap is a factor of 2.8; at p/n = 0.8 it is 25.
 
-Constraints are known to help ([Jagannathan and Ma, 2003](https://www.nber.org/papers/w8922)), but the algebra behind the classical formula needs a closed-form solution, and with inequality constraints there is none. The standard workaround has been a jackknife that refits the portfolio n times ([Basak, Jagannathan and Ma, 2009](https://doi.org/10.1287/mnsc.1090.1001)).
+Constraints are known to help ([Jagannathan and Ma, 2003](https://www.nber.org/papers/w8922)), but the algebra behind the classical formula needs a closed-form solution, and with inequality constraints there is none. The standard workaround is the jackknife ([Basak, Jagannathan and Ma, 2009](https://doi.org/10.1287/mnsc.1090.1001)): refit the portfolio n times and see how far the refits scatter.
 
 # 3 Count the face, not the assets
 

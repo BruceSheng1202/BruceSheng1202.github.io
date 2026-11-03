@@ -1,9 +1,9 @@
 window.POST_CONTENT = {
-  en: String.raw`A decision model gives a probability for every option in one forward pass. That is fast, but the compute it can spend on a question is fixed. Questions that need several steps of reasoning suffer: answering straight away is not enough, and the model would have to work through something in between.
+  en: String.raw`A decision model gives a probability for every option in one forward pass. That is fast, but the compute it can spend on a question is fixed. On questions that need several steps of reasoning, answering straight away is not enough; the model has to be given room to think.
 
-Writing those steps out — an explicit chain of thought, or more samples at test time — does help, but every step costs tokens, and inference gets more expensive as the answer gets longer. A cheaper place to think is latent space: produce no intermediate text, and instead run the same block of layers more than once. That is what a looped language model does — the parameter count stays fixed, and each extra loop adds a layer of depth. We worked through its training recipe and compute bill in [an earlier note](../loop-compute-ledger/).
+Writing the reasoning out — an explicit chain of thought — does help, but every step generates tokens, the cost of inference grows with it, and the advantage of a decision model disappears. A cheaper place to think is latent space: produce no intermediate text, run the same block of layers more than once, and still read the score off the classifier head at the end. That is what a looped language model does — the parameter count stays fixed, and each extra loop adds depth. We worked through its training recipe and compute bill in [an earlier note](../loop-compute-ledger/).
 
-This post asks whether the same move carries over to a decision model: no new pretraining, just LoRA, letting the middle layers of our existing 4B model run several times, and seeing whether reasoning improves.
+This post asks whether that looped depth carries over to a decision model: no new pretraining, just LoRA, letting the middle layers of our existing 4B model run several times, and seeing whether reasoning improves.
 
 # 1 Takeaways
 
@@ -77,11 +77,11 @@ This matches what LEV report: the gain from looping comes mainly from pretrainin
 3\. Scaling Latent Reasoning via Looped Language Models (Ouro). arXiv:2510.25741. [https://arxiv.org/abs/2510.25741](https://arxiv.org/abs/2510.25741)
 
 4\. tasksource/procedural-typed-decisions (PTD). [https://huggingface.co/datasets/tasksource/procedural-typed-decisions](https://huggingface.co/datasets/tasksource/procedural-typed-decisions)`,
-  zh: String.raw`决策模型一次前向就给出每个选项的概率，很快，但每道题能用的计算量是固定的。碰到要推好几步的题，直接给答案就不够了，模型得在中间多想几步。
+  zh: String.raw`决策模型一次前向就给出每个选项的概率，很快，但每道题能用的计算量是固定的。碰到要推好几步的题，直接给答案就不够了，得想办法让模型多思考。
 
-把思考过程写出来（显式的思维链、测试时多采样）确实有用，但每一步都要生成 token，推理成本跟着变长。更省的办法是在隐空间里想：不产出中间文字，让同一组层多转几遍。循环语言模型就是这么做的，参数不变，多转一轮就多一层深度；它的训练配方和算力开销，我们之前在[那篇笔记](../loop-compute-ledger/)里算过。
+把思考过程写出来（显式的思维链）确实有用，但每一步都要生成 token，推理成本跟着变长，决策模型的优势就不复存在。更省的办法是在隐空间里想：不产出中间文字，让同一组层多转几遍，转完了还是走分类头出分。循环语言模型就是这么做的，参数不变，多转一轮就多一层深度；它的训练配方和算力开销，我们之前在[那篇笔记](../loop-compute-ledger/)里算过。
 
-这篇要试的是把这件事搬到决策模型上：不重新预训练，只训 LoRA，让现有 4B 决策模型的中间几层多转几遍，看推理能力会不会跟着变强。
+这篇要试的是把循环深度搬到决策模型上：不重新预训练，只训 LoRA，让现有 4B 决策模型的中间几层多转几遍，看推理能力会不会跟着变强。
 
 # 1 结论
 

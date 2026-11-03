@@ -57,9 +57,11 @@ The reason is simple. The answers that change after pass 2 come almost entirely 
 - **They also tried retrofitting ordinary models, without much luck.** LEV saw almost no change on Qwen3.5-0.8B, and SanSi saw no gain on SmolLM2-1.7B. Ours did a little better, but the gain is still small.
 - **Too many passes flip answers back and forth and cost accuracy;** SanSi saw this too.
 
-# 7 What we did not try
+# 7 Limitations
 
-This conclusion holds for a budget of LoRA only and under 20k training examples. A larger LoRA, large-scale continued pretraining (successful retrofits in the literature used billions to over a hundred billion tokens), or simply a base that was pretrained to loop are all still untested.
+The conclusion sits inside a narrow budget: LoRA only, twenty thousand rows or fewer. A larger LoRA, large-scale continued pretraining (the successful retrofits in the literature used billions to over a hundred billion tokens), or a base that already loops during pretraining would all change it.
+
+This matches what LEV report: the gain from looping comes mainly from pretraining, where the model first learns to use the extra computation. Getting a plain base decision model to learn looping through simple post-hoc training is hard. In our runs one extra pass buys 2–3 points and the curve then flattens; our reading is that this is not a tuning problem but a signal problem — the training signal does not teach the model what to do with the extra compute.
 
 # References
 

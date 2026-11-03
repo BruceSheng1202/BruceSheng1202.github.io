@@ -58,9 +58,11 @@ The reason is simple. The answers that change after pass 2 come almost entirely 
 - **They also tried retrofitting ordinary models, without much luck.** LEV saw almost no change on Qwen3.5-0.8B, and SanSi saw no gain on SmolLM2-1.7B. Ours did a little better, but the gain is still small.
 - **Too many passes flip answers back and forth and cost accuracy;** SanSi saw this too.
 
-# 7 What we did not try
+# 7 Limitations
 
-This conclusion holds for a budget of LoRA only and under 20k training examples. A larger LoRA, large-scale continued pretraining (successful retrofits in the literature used billions to over a hundred billion tokens), or simply a base that was pretrained to loop are all still untested.
+The conclusion sits inside a narrow budget: LoRA only, twenty thousand rows or fewer. A larger LoRA, large-scale continued pretraining (the successful retrofits in the literature used billions to over a hundred billion tokens), or a base that already loops during pretraining would all change it.
+
+This matches what LEV report: the gain from looping comes mainly from pretraining, where the model first learns to use the extra computation. Getting a plain base decision model to learn looping through simple post-hoc training is hard. In our runs one extra pass buys 2–3 points and the curve then flattens; our reading is that this is not a tuning problem but a signal problem — the training signal does not teach the model what to do with the extra compute.
 
 # References
 
@@ -130,9 +132,11 @@ This conclusion holds for a budget of LoRA only and under 20k training examples.
 - **它们也试过改造普通模型，同样不太行。** LEV 在 Qwen3.5-0.8B 上几乎没变化，SanSi 在 SmolLM2-1.7B 上没有收益。我们好一点，但也很小。
 - **转多了来回改、掉分，** SanSi 也看到了。
 
-# 7 还没试的
+# 7 局限
 
-这个结论只适用于"只训 LoRA、两万条以内数据"的预算。更大的 LoRA、大规模继续预训练（文献里成功的改造用了几十亿到一千多亿 token），或者直接换一个会循环的底座，我们都还没试。
+这个结论只落在一个很窄的预算里：只训 LoRA、数据两万条以内。更大的 LoRA、大规模继续预训练（文献里成功的改造用了几十亿到一千多亿 token），或者换一个在预训练阶段就会循环的底座，都可能改写它。
+
+和 LEV 的结论类似，我们看到的也是这件事：循环的收益主要来自预训练，模型要先在预训练里学会怎么用这些额外的计算。想让一个普通基座决策模型靠事后简单训练学会循环，很难。我们的结果里，多转一遍能拿到 2–3 点，再往上就停在原地；我们更倾向于认为，这不是调参没到位，而是训练信号不足以教会模型怎么使用多出来的计算。
 
 # 参考文献
 

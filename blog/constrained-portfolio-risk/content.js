@@ -23,7 +23,7 @@ This post is about what replaces it. The answer fits in one line: count the hold
 
 # 2 Why the optimizer's number is too low
 
-Two things have to happen together.
+Two things cause this.
 
 First, the covariance matrix is estimated, and estimated badly. For 500 stocks it has 125,250 distinct entries; a year of daily data gives 250 × 500 = 125,000 numbers. Every entry carries real noise.
 

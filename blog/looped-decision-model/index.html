@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="We let the middle layers of a 4B decision model run several times, training LoRA only. One extra pass helps by 2–3 points; more passes, other training recipes and learned stopping do not.">
+  <title>Looping a Decision Model: One Extra Pass Helps, More Does Not — Huanxin Sheng</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="content.js"></script>
+  <style>
+    .article-head h1 { white-space: normal; text-wrap: balance; }
+    html[lang="zh-CN"] .article-head h1 { font-size: clamp(1.6rem, 2.25vw, 2.25rem); }
+    .table-scroll table { font-size: .79rem; }
+    .table-scroll th, .table-scroll td { padding: 6px 8px; }
+    .table-scroll th { white-space: normal; }
+  </style>
+</head>
+<body>
+  <header class="topbar"><nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="../../index.html">Huanxin Sheng</a>
+    <div class="navlinks"><a href="../../index.html">Homepage</a><a href="../index.html" aria-current="page">Blog</a></div>
+  </nav></header>
+  <main class="article-shell">
+    <aside id="toc" class="toc" aria-label="Table of contents">
+      <div class="toc-title" data-en="On this page" data-zh="本文目录">On this page</div>
+      <div id="toc-links"></div>
+    </aside>
+    <div class="article-main">
+      <header class="article-head">
+        <p class="eyebrow" data-en="Research note · November 3, 2026" data-zh="研究笔记 · 2026 年 11 月 3 日">Research note · November 3, 2026</p>
+        <h1 data-en="Looping a Decision Model: One Extra Pass Helps, More Does Not" data-zh="让决策模型多转几遍：多一遍有用，再多就没用了">Looping a Decision Model: One Extra Pass Helps, More Does Not</h1>
+        <p class="dek" data-en="A 4B decision model whose middle layers run several times, trained with LoRA only: one extra pass adds 2–3 points on multi-step reasoning; more passes do not." data-zh="只训 LoRA，让 4B 决策模型的中间几层多转几遍：多转一遍，多步推理题高 2–3 点；再多转就没用了。">A 4B decision model whose middle layers run several times, trained with LoRA only: one extra pass adds 2–3 points on multi-step reasoning; more passes do not.</p>
+        <div class="meta article-meta">
+          <span>Huanxin Sheng</span><span>·</span><span data-en="November 3, 2026" data-zh="2026 年 11 月 3 日">November 3, 2026</span><span>·</span><span data-en="4 min read" data-zh="约 4 分钟阅读">4 min read</span>
+          <div class="lang article-lang" aria-label="Article language"><button data-lang="en">EN</button><button data-lang="zh">中文</button></div>
+        </div>
+      </header>
+      <article id="article" class="article" aria-live="polite"><p>Loading article…</p></article>
+    </div>
+    <aside id="citation-rail" class="citation-rail" aria-label="References cited alongside the article">
+      <div id="citation-notes"></div>
+    </aside>
+  </main>
+  <footer class="footer"><div class="wrap"><a href="../index.html" data-en="← All notes" data-zh="← 返回全部文章">← All notes</a></div></footer>
+  <script src="../assets/language.js"></script>
+  <script>
+    window.POST_CONFIG = {
+      term: 'looped-decision-model',
+      content: 'POST_CONTENT',
+      bibtex: `@misc{sheng2026loopeddecision,
+  author = {Sheng, Huanxin},
+  title  = {Looping a Decision Model: One Extra Pass Helps, More Does Not},
+  year   = {2026},
+  month  = nov,
+  url    = {https://brucesheng1202.github.io/blog/looped-decision-model/},
+  note   = {Blog post}
+}`
+    };
+  </script>
+  <script src="../assets/post.js"></script>
+</body>
+</html>

@@ -18,6 +18,8 @@ Welcome! 👋 This repo hosts my academic homepage and research blog.
 
 ## Latest Blog
 
+- **Nov 2026** — [Looping a Decision Model: One Extra Pass Helps, More Does Not](https://brucesheng1202.github.io/blog/looped-decision-model/?lang=en)
+  LoRA-only retrofit on a 4B decision model: one extra pass through the middle layers adds 2–3 points on multi-step reasoning, and further passes stop helping.
 - **Oct 2026** — [Generative Judges Before Jev, and a Meta-Harness for a 4B Judge](https://brucesheng1202.github.io/blog/judge-meta-harness/?lang=en)
   Twenty-one generative judges on three rubric benchmarks, set against the decision model Jev 1.13; then an automated harness search that moves a 4B judge from 61.11 to 72.58 test MF1 on HealthBench meta-evaluation.
 - **Oct 2026** — [Accounting for Compute in a Looped Model](https://brucesheng1202.github.io/blog/loop-compute-ledger/?lang=en)

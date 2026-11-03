@@ -2,12 +2,12 @@ A decision model gives a probability for every option in one forward pass. That 
 
 Writing the reasoning out — an explicit chain of thought — does help, but every step generates tokens, the cost of inference grows with it, and the advantage of a decision model disappears. A cheaper place to think is latent space: produce no intermediate text, run the same block of layers more than once, and still read the score off the classifier head at the end. That is what a looped language model does — the parameter count stays fixed, and each extra loop adds depth. We worked through its training recipe and compute bill in [an earlier note](../loop-compute-ledger/).
 
-This post asks whether that looped depth carries over to a decision model: no new pretraining, just LoRA, letting the middle layers of our existing 4B model run several times, and seeing whether reasoning improves.
+This post asks whether that looped depth carries over to a decision model: no new pretraining, just LoRA, letting the middle layers of our existing 4B model run several times, and seeing whether reasoning improves. The answer is not encouraging; the rest of the post shows why.
 
 # 1 Takeaways
 
 - **One extra pass helps.** On multi-step reasoning tasks it beats an ordinary model by 2–3 points, and loses nothing elsewhere.
-- **More passes do not help overall.** After the third pass only the multi-step rule tasks still creep up; the rest get worse.
+- **More passes do not help overall.** After the third pass only the multi-step rule tasks still creep up; the rest get worse, so most of the gain is given back.
 - **Changing the training recipe does not fix this.** We tried 5 variations; later passes stay useless.
 - **The model cannot learn when to stop.** The best rule is simply to always run 2 passes.
 
@@ -38,7 +38,7 @@ Pass 2 leads reliably on multi-step reasoning and loses nothing elsewhere. By pa
 
 On synthetic multi-step reasoning tasks we tried several training recipes, changing one thing at a time:
 
-- **Weight every pass's loss equally, as LEV and SanSi do:** pass 1 gets better, pass 4 does not. The gain just moves earlier.
+- **Weight every pass's loss equally, as LEV and SanSi do:** pass 1 gets better, pass 4 does not. The gain just moves earlier; the total does not change.
 - **Run a random 1–4 passes each time and penalize getting worse:** the model learns to answer in the first pass, and later passes do almost nothing.
 - **Take only half a step per pass:** the middle passes are a little steadier, but none clearly beats pass 2, and later passes still decline.
 - **No retraining, smaller steps at inference:** fewer answers get broken, but fewer get fixed too; no pass beats pass 2.
@@ -56,14 +56,14 @@ The reason is simple. The answers that change after pass 2 come almost entirely 
 
 # 6 Compared with LEV and SanSi
 
-- **Different bases.** Theirs were pretrained to loop ([Ouro](https://arxiv.org/abs/2510.25741), Nanbeige); ours is an ordinary model.
+- **Different bases.** Theirs were pretrained to loop ([Ouro](https://arxiv.org/abs/2510.25741), Nanbeige); ours is an ordinary model, so the ability has to be added afterwards.
 - **Different number of useful passes.** For them 2–3 extra passes help; for us only 1.
-- **They also tried retrofitting ordinary models, without much luck.** LEV saw almost no change on Qwen3.5-0.8B, and SanSi saw no gain on SmolLM2-1.7B. Ours did a little better, but the gain is still small.
+- **They also tried retrofitting ordinary models, without much luck.** LEV saw almost no change on Qwen3.5-0.8B, and SanSi saw no gain on SmolLM2-1.7B. Ours did a little better, but the gain is still small, hardly an advantage.
 - **Too many passes flip answers back and forth and cost accuracy;** SanSi saw this too.
 
 # 7 Limitations
 
-The conclusion sits inside a narrow budget: LoRA only, twenty thousand rows or fewer. A larger LoRA, large-scale continued pretraining (the successful retrofits in the literature used billions to over a hundred billion tokens), or a base that already loops during pretraining would all change it.
+The conclusion sits inside a narrow budget: LoRA only, twenty thousand rows or fewer. A larger LoRA, large-scale continued pretraining (the successful retrofits in the literature used billions to over a hundred billion tokens), or a base that already loops during pretraining would all change the conclusion.
 
 This matches what LEV report: the gain from looping comes mainly from pretraining, where the model first learns to use the extra computation. Getting a plain base decision model to learn looping through simple post-hoc training is hard. In our runs one extra pass buys 2–3 points and the curve then flattens; our reading is that this is not a tuning problem but a signal problem — the training signal does not teach the model what to do with the extra compute.
 

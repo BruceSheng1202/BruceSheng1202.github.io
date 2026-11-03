@@ -55,7 +55,8 @@ a { color: var(--blue); }
 .article h1#references { padding-top: 1.4rem; border-top: 1px solid var(--line); }
 .article h1#references ~ p { margin: .85rem 0; padding-left: 1.6rem; text-indent: -1.6rem; color: #4d576b; font: .84rem/1.62 var(--sans); }
 .article h2 { margin: 2.2em 0 .65em; font-size: 1.5rem; }
-.article p { margin: 1em 0; }
+.article p { margin: 1em 0; text-wrap: pretty; }
+.article li { text-wrap: pretty; }
 .article li { margin: .35em 0; }
 .article blockquote { margin: 1.7em 0; padding: 2px 0 2px 22px; border-left: 3px solid var(--blue); color: var(--muted); }
 .article img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; background: white; }

@@ -1,4 +1,8 @@
-A decision model gives a probability for every option in one forward pass. It is fast, but the compute it can spend on a question is fixed, so questions that need several steps of reasoning are hard for it. We tried a cheap fix: no new pretraining, just LoRA, to let the middle layers of our existing 4B decision model run several times.
+A decision model gives a probability for every option in one forward pass. That is fast, but the compute it can spend on a question is fixed. Questions that need several steps of reasoning suffer: answering straight away is not enough, and the model would have to work through something in between.
+
+Writing those steps out — an explicit chain of thought, or more samples at test time — does help, but every step costs tokens, and inference gets more expensive as the answer gets longer. A cheaper place to think is latent space: produce no intermediate text, and instead run the same block of layers more than once. That is what a looped language model does — the parameter count stays fixed, and each extra loop adds a layer of depth. We worked through its training recipe and compute bill in [an earlier note](../loop-compute-ledger/).
+
+This post asks whether the same move carries over to a decision model: no new pretraining, just LoRA, letting the middle layers of our existing 4B model run several times, and seeing whether reasoning improves.
 
 # 1 Takeaways
 

@@ -18,6 +18,8 @@ Welcome! 👋 This repo hosts my academic homepage and research blog.
 
 ## Latest Blog
 
+- **Nov 2026** — [Count the Holdings, Not the Assets: How Much Risk a Constrained Portfolio Hides](https://brucesheng1202.github.io/blog/constrained-portfolio-risk/?lang=en)
+  A long-only minimum-variance portfolio reports a fraction of the risk it carries. Dividing by (1 − d/m)², with d the number of holdings minus one, recovers it; the classical (1 − p/n)² correction overshoots by up to 18.6 times.
 - **Nov 2026** — [Looping a Decision Model: One Extra Pass Helps, More Does Not](https://brucesheng1202.github.io/blog/looped-decision-model/?lang=en)
   LoRA-only retrofit on a 4B decision model: one extra pass through the middle layers adds 2–3 points on multi-step reasoning, and further passes stop helping.
 - **Oct 2026** — [Generative Judges Before Jev, and a Meta-Harness for a 4B Judge](https://brucesheng1202.github.io/blog/judge-meta-harness/?lang=en)

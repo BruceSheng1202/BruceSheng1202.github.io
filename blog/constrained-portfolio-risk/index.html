@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A long-only minimum-variance portfolio of 500 stocks fit on 250 days reports about 1/18 of the variance it carries. Dividing the in-sample variance by (1 − d/m)², with d the number of holdings minus one, recovers it; for fewer stocks than days this is proved for any covariance and any linear constraints.">
+  <title>Count the Holdings, Not the Assets: How Much Risk a Constrained Portfolio Hides — Huanxin Sheng</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="content.js"></script>
+  <style>
+    .article-head h1 { white-space: normal; text-wrap: balance; }
+    html[lang="zh-CN"] .article-head h1 { font-size: clamp(1.6rem, 2.25vw, 2.25rem); }
+    .table-scroll table { font-size: .79rem; }
+    .table-scroll th, .table-scroll td { padding: 6px 8px; }
+    .table-scroll th { white-space: normal; }
+  </style>
+</head>
+<body>
+  <header class="topbar"><nav class="nav" aria-label="Primary navigation">
+    <a class="brand" href="../../index.html">Huanxin Sheng</a>
+    <div class="navlinks"><a href="../../index.html">Homepage</a><a href="../index.html" aria-current="page">Blog</a></div>
+  </nav></header>
+  <main class="article-shell">
+    <aside id="toc" class="toc" aria-label="Table of contents">
+      <div class="toc-title" data-en="On this page" data-zh="本文目录">On this page</div>
+      <div id="toc-links"></div>
+    </aside>
+    <div class="article-main">
+      <header class="article-head">
+        <p class="eyebrow" data-en="Research note · November 3, 2026" data-zh="研究笔记 · 2026 年 11 月 3 日">Research note · November 3, 2026</p>
+        <h1 data-en="Count the Holdings, Not the Assets: How Much Risk a Constrained Portfolio Hides" data-zh="数持仓，不数资产：约束组合藏了多少风险">Count the Holdings, Not the Assets: How Much Risk a Constrained Portfolio Hides</h1>
+        <p class="dek" data-en="A long-only minimum-variance portfolio of 500 stocks fit on 250 days reports about 1/18 of the variance it carries. Dividing by (1 − d/m)², with d the number of holdings minus one, recovers it to within 1% on average; for fewer stocks than days this is proved for any covariance and any linear constraints." data-zh="500 只股票、250 天数据、禁止卖空：优化器报出的方差只有真实值的约 1/18。除以 (1 − d/m)²（d 为持仓数减一），平均误差不到 1%；股票比天数少时，这对任意协方差、任意线性约束都可以严格证明。">A long-only minimum-variance portfolio of 500 stocks fit on 250 days reports about 1/18 of the variance it carries. Dividing by (1 − d/m)², with d the number of holdings minus one, recovers it to within 1% on average; for fewer stocks than days this is proved for any covariance and any linear constraints.</p>
+        <div class="meta article-meta">
+          <span>Huanxin Sheng</span><span>·</span><span data-en="November 3, 2026" data-zh="2026 年 11 月 3 日">November 3, 2026</span><span>·</span><span data-en="13 min read" data-zh="约 13 分钟阅读">13 min read</span>
+          <div class="lang article-lang" aria-label="Article language"><button data-lang="en">EN</button><button data-lang="zh">中文</button></div>
+        </div>
+      </header>
+      <article id="article" class="article" aria-live="polite"><p>Loading article…</p></article>
+    </div>
+    <aside id="citation-rail" class="citation-rail" aria-label="References cited alongside the article">
+      <div id="citation-notes"></div>
+    </aside>
+  </main>
+  <footer class="footer"><div class="wrap"><a href="../index.html" data-en="← All notes" data-zh="← 返回全部文章">← All notes</a></div></footer>
+  <script src="../assets/language.js"></script>
+  <script>
+    window.POST_CONFIG = {
+      term: 'constrained-portfolio-risk',
+      content: 'POST_CONTENT',
+      bibtex: `@misc{sheng2026constrainedrisk,
+  author = {Sheng, Huanxin},
+  title  = {Count the Holdings, Not the Assets: How Much Risk a Constrained Portfolio Hides},
+  year   = {2026},
+  month  = nov,
+  url    = {https://brucesheng1202.github.io/blog/constrained-portfolio-risk/},
+  note   = {Blog post}
+}`
+    };
+  </script>
+  <script src="../assets/post.js"></script>
+</body>
+</html>

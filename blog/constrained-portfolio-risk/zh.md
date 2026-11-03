@@ -3,7 +3,7 @@
 <p>三年前我还在做 RA，用 MATLAB 和 R 做高维带约束的投资组合，代码在 <a href="https://github.com/microfan1/CROWN">CROWN</a>，老师的论文后来发在 <a href="https://www.tandfonline.com/doi/full/10.1080/01621459.2025.2602832">JASA</a>。当时翻的是学长打印的范剑青教授《<a href="https://www.taylorfrancis.com/books/mono/10.1201/9780429096280/statistical-foundations-data-science-jianqing-fan-runze-li-cun-hui-zhang-hui-zou">数据科学统计基础</a>》，毕业前还帮忙校对了它的<a href="http://fj.tsxcfw.com/bookshow.asp?id=3230017">中译本</a>。</p>
 <p>三年后的今天，LLM agents 在数学和代码上已经这么强，用不着我自己去推凸锥优化、内点法求解、算夏普比率，这种研究也不需要多卡 GPU 那样的算力。而我还在学这些高等统计学，于是不免好奇：最强的 AI 能不能写出一篇合格的统计四大顶刊论文，从 idea 到成稿？</p>
 <p>顺着高维统计组合这个题目，我把要求写成 prompt，让 Claude Opus 5.5 Max 跑 autoresearch，一天之内就产出了一篇论文，并以 blog 的形式放在这里。整个过程我很少干预它的行为和决定：idea、实验、论文、乃至这篇 blog 都是它写的，我只做了粗略审核和校对，不把这份 contribution 算在自己头上，只当作分享和反思。</p>
-<p>这项研究看起来像那么一回事，但我很难保证它真的有研究价值和实用价值。更让我在意的是另一件事：如果一天就能产出这样一项研究，是不是一个"卷王"可以一天投一篇统计顶刊，审稿系统很快就会承受不住？当人类专家越来越难应对 AI 生成的研究成果，怎么分辨一篇论文的 validity 和 contribution、并据此写出真正合格的 reviews、决定 accept 还是 reject，是我真正好奇的研究问题。</p>
+<p>这项研究看起来像那么一回事，但我很难保证它真的有研究价值和实用价值。更让我在意的是另一件事：如果一天就能产出这样一项研究，是不是一个"卷王"可以一天投一篇统计顶刊，审稿系统一定承受不住？当人类专家越来越难应对 AI 生成的研究成果，怎么分辨一篇论文的 validity 和 contribution、并据此写出真正合格的 reviews、决定 accept 还是 reject，是我真正好奇的研究问题。</p>
 </div>
 
 用一年的日收益率算一个最小方差组合，优化器会顺便告诉你这个组合的风险有多大。这个数是偏低的，而且常常低得离谱。后面有个例子：500 只股票、250 天数据、禁止卖空，优化器报出来的方差只有组合实际方差的约 1/18。这个例子后面还会回来。

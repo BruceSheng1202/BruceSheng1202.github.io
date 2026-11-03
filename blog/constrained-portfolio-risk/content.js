@@ -3,7 +3,7 @@ window.POST_CONTENT = {
 
 The reason is the same one that makes training error lower than test error. The covariance matrix is estimated from the same data the optimizer uses to pick the weights, and the optimizer is very good at finding combinations whose risk the sample happens to underestimate. Without constraints the size of this gap has been known for a long time. Real portfolios are constrained — no short sales, position limits, sector bounds, tracking-error budgets — and once a constraint binds, the classical formula no longer applies.
 
-This post is about what replaces it. The answer fits in one line: count the holdings, not the assets. A paper with the proofs is in preparation; I will link the preprint here when it is out.
+This post is about what replaces it. The answer fits in one line: count the holdings, not the assets.
 
 # 1 Takeaways
 
@@ -165,7 +165,7 @@ Where the floor lies below the target in most windows, the calibrated portfolio 
 
 原因和"训练误差总比测试误差好看"是一回事。协方差矩阵是用数据估出来的，优化器又用同一份数据去挑权重，它特别擅长找到那些"在这份样本里风险恰好被低估"的组合。不加约束时，这个差距有多大早就算清楚了。可实际的组合都有约束：禁止卖空、单只上限、行业比例、跟踪误差预算。约束一旦顶住，经典公式就不再适用。
 
-这篇讲的是用什么来代替它。答案一句话：数持仓，不数资产。带完整证明的论文正在准备中，预印本出来后我会把链接补在这里。
+这篇讲的是用什么来代替它。答案一句话：数持仓，不数资产。
 
 # 1 结论
 

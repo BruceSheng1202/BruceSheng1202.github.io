@@ -2,7 +2,7 @@ Fit a minimum-variance portfolio on a year of daily returns and the optimizer te
 
 The reason is the same one that makes training error lower than test error. The covariance matrix is estimated from the same data the optimizer uses to pick the weights, and the optimizer is very good at finding combinations whose risk the sample happens to underestimate. Without constraints the size of this gap has been known for a long time. Real portfolios are constrained — no short sales, position limits, sector bounds, tracking-error budgets — and once a constraint binds, the classical formula no longer applies.
 
-This post is about what replaces it. The answer fits in one line: count the holdings, not the assets. A paper with the proofs is in preparation; I will link the preprint here when it is out.
+This post is about what replaces it. The answer fits in one line: count the holdings, not the assets.
 
 # 1 Takeaways
 

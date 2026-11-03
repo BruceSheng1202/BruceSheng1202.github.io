@@ -15,10 +15,10 @@ This post is about what replaces it. The answer fits in one line: count the hold
 # 1 Takeaways
 
 - **Count the holdings, not the assets.** With n days of data, divide the in-sample variance by (1 − d/m)<sup>2</sup>, where m = n − 1 and d is the number of stocks held minus one. In general d is the dimension of the face of the constraint set on which the optimizer lands, and the optimizer reports it for free.
-- **With fewer stocks than days, this is provably accurate** for every covariance matrix and every set of linear constraints, with an error that shrinks like 1/√m. In 20 simulated markets the corrected value is within 2.6% of the true variance on average; the uncorrected value is up to 150 times too low.
-- **Counting all the assets overshoots.** The classical correction, which uses the number of stocks p instead of d, puts the risk 1.3 to 3.1 times too high at p/n = 0.5 and up to 18.6 times too high at p/n = 0.8. Once p ≥ n it is not defined at all.
-- **With more stocks than days, one number decides whether the portfolio breaks.** The optimizer finds a portfolio with zero in-sample risk exactly when the statistical dimension of the constraint cone exceeds m. Below that line the correction still works.
-- **For tracking-error mandates, the same idea sets the budget.** On NASDAQ data, capping the in-sample tracking error at the target overshoots it by 27% to 132% at the median; calibrating the cap with d brings this to 0% to 12%. With more stocks than days there is a floor that no budget can push below.
+- **With fewer stocks than days, this is provably accurate** for every covariance matrix and every set of linear constraints, with an error that shrinks like 1/√m. Across 20 simulated settings, with p/n from 0.5 to 4, the corrected value is within 2.6% of the true variance on average; the uncorrected value is up to 150 times too low.
+- **Counting all the assets overshoots.** The classical correction, which uses the number of stocks p instead of d, gives 1.35 to 3.13 times the true variance at p/n = 0.5 and up to 18.6 times at p/n = 0.8. Once p ≥ n it is not defined at all.
+- **With more stocks than days, one number decides whether the portfolio breaks.** When the statistical dimension of the whitened constraint cone is clearly above m, the optimizer almost surely finds a portfolio with zero in-sample risk; when it is clearly below m, it almost never does. Well below that line the correction is still proved to work, under conditions given in Section 5.
+- **For tracking-error mandates, the same idea sets the budget.** On NASDAQ data, capping the in-sample tracking error at the target overshoots it by 27% to 132% at the median; calibrating the cap with d brings this to 0% to 12% (both with fewer stocks than days). With more stocks than days there is a floor: shrinking the budget cannot push realized tracking error below it.
 
 # 2 Why the optimizer's number is too low
 
@@ -28,11 +28,11 @@ First, the covariance matrix is estimated, and estimated badly. For 500 stocks i
 
 Second, the same data both choose the portfolio and grade it. Fix a portfolio in advance and its sample variance is an unbiased estimate of its true variance: sometimes high, sometimes low, right on average. The bias comes from choosing. The simplest version: take 500 stocks with exactly the same true variance, estimate each variance from 250 days, and pick the stock with the smallest estimate. In a quick simulation the winner's estimated variance averages 0.75 of its true value. No single estimate is wrong; the winner is just the stock whose noise happened to help.
 
-A minimum-variance optimizer does this on a much larger scale. It does not only pick quiet stocks; it also builds hedges out of correlations that look strong in the sample. Two stocks whose sample correlation is 0.8 but whose true correlation is 0.3 look like a good long–short pair. Out of sample the hedge does not hedge.
+A minimum-variance optimizer does this on a much larger scale. It does not only pick quiet stocks; it also builds hedges out of correlations that look strong in the sample. Two stocks whose sample correlation is 0.5 but whose true correlation is 0.3 look like a good long–short pair. Out of sample the hedge does not hedge.
 
-Without constraints the damage is known precisely. The in-sample variance is too low by a factor of about 1 − p/n ([El Karoui, 2010](https://arxiv.org/abs/1211.2917)), and the variance you actually bear is too high by about 1/(1 − p/n), so the two differ by about (1 − p/n)<sup>−2</sup>. Dividing by that factor was proposed as a correction for risk forecasts ([Shepard, 2009](https://arxiv.org/abs/0908.2455)). At p/n = 0.4 the gap is a factor of 2.8; at p/n = 0.8 it is 25.
+Without constraints the damage is known precisely. Measured against the best variance you could reach if you knew the true covariance, the in-sample variance is too low by a factor of about 1 − p/n ([El Karoui, 2010](https://arxiv.org/abs/1211.2917)), and the variance you actually bear is too high by about 1/(1 − p/n), so the two differ by about (1 − p/n)<sup>−2</sup>. Dividing by that factor was proposed as a correction for risk forecasts ([Shepard, 2009](https://arxiv.org/abs/0908.2455)). At p/n = 0.4 the gap is a factor of 2.8; at p/n = 0.8 it is 25.
 
-Constraints are known to help ([Jagannathan and Ma, 2003](https://www.nber.org/papers/w8922)), but the algebra behind the classical formula needs a closed-form solution, and with inequality constraints there is none. The standard workaround is the jackknife ([Basak, Jagannathan and Ma, 2009](https://doi.org/10.1287/mnsc.1090.1001)): refit the portfolio n times and see how far the refits scatter.
+Constraints are known to help ([Jagannathan and Ma, 2003](https://www.nber.org/papers/w8922)), but the algebra behind the classical formula needs a closed-form solution, and with inequality constraints there is none. The standard workaround is the jackknife ([Basak, Jagannathan and Ma, 2009](https://doi.org/10.1287/mnsc.1090.1001)): refit the portfolio n times, each time leaving out one day, and measure each refit on the day it did not see.
 
 # 3 Count the face, not the assets
 
@@ -48,18 +48,18 @@ That suggests replacing the classical p − 1 free parameters by d:
 
 where R<sub>in</sub> is the in-sample variance the optimizer reports and R<sub>out</sub> is the variance the portfolio really has. The rule extends to any linear constraints. With upper and lower bounds on each weight, d counts the weights strictly between their bounds, minus one; every extra constraint that binds, such as a sector limit at its cap, removes one more direction.
 
-Back to the opening example: 500 stocks with AR(1) correlations, 250 days, short sales banned. The optimizer holds about 192 stocks, so d/m ≈ 0.77. The in-sample variance is 1/18.6 of the truth, and dividing by (1 − 0.77)<sup>2</sup> recovers the truth to within 0.1% on average. Counted in assets the problem looks hopeless, with p/n = 2; counted in free directions it is not.
+Back to the opening example: 500 stocks with AR(1) correlations, 250 days, short sales banned. The optimizer holds about 192 stocks, so d/m ≈ 0.77. The in-sample variance is 1/18.6 of the truth, and dividing by (1 − 0.77)<sup>2</sup> recovers the truth on average (the mean ratio is 0.999), although single samples still scatter by about ±25%. Counted in assets the problem looks hopeless, with p/n = 2; counted in free directions it is not.
 
-The obvious objection: d is chosen by the data. We just saw that choosing creates bias, so why should a chosen number correct it? The lasso has the same structure. Which coefficients are non-zero is decided by the data, and yet the lasso's degrees of freedom equal the number of non-zero coefficients ([Tibshirani and Taylor, 2012](https://doi.org/10.1214/12-AOS1003)). The constrained portfolio is a least-squares problem in disguise, and d is exactly its degrees of freedom: near the solution, the face does not change under small perturbations of the data, and for Gaussian returns that holds with probability one.
+The obvious objection: d is chosen by the data. We just saw that choosing creates bias, so why should a chosen number correct it? The lasso has the same structure. Which coefficients are non-zero is decided by the data, and yet the number of non-zero coefficients is an unbiased estimate of the lasso's degrees of freedom ([Tibshirani and Taylor, 2012](https://doi.org/10.1214/12-AOS1003)). The constrained portfolio is a least-squares problem in disguise, and d is exactly its degrees of freedom: near the solution, the face does not change under small perturbations of the data, and for Gaussian returns that holds with probability one.
 
-What was missing was a proof that this works where portfolios live: random returns rather than a fixed design, and a hard constraint rather than a penalty. [Bellec (2023)](https://arxiv.org/abs/2008.11840) proved the (1 − df/n)<sup>−2</sup> estimate for convex penalties that take finite values, which rules constraints out. We reach constraints as the limit of steeper and steeper penalties. Two results come out:
+What was missing was a finite-sample proof that this works where portfolios live: random returns rather than a fixed design, and a hard constraint rather than a penalty. Exact asymptotic risks for constrained least squares with random design were known under extra conditions, for example when p < n and the relevant limits exist ([Celentano and Montanari, 2022](https://arxiv.org/abs/1903.10603)); a bound that holds at every sample size, uniformly over covariances and constraints, was not. [Bellec (2023)](https://arxiv.org/abs/2008.11840) proved the (1 − df/n)<sup>−2</sup> estimate for convex penalties that take finite values, which rules constraints out. We reach constraints as the limit of steeper and steeper penalties. Two results come out:
 
 - **A finite-sample bound.** For p < n, the expected relative error of the corrected estimate is at most C/√m, where C depends only on p/n — not on the covariance matrix, not on the constraints, and not on whether the constraints bind in the population.
-- **An exact identity.** It says why the correction works: the bias of R<sub>in</sub> is of first order, about 2d/m in relative terms, and the bias of the corrected estimate is of second order.
+- **An exact identity.** It says why the correction works: the bias of R<sub>in</sub> is of first order, about 2d/m in relative terms, and when d/m is small the bias of the corrected estimate is of second order.
 
 # 4 How accurate is it?
 
-Figure 2 covers 20 simulated markets: independent stocks, AR(1) correlations, and one- and three-factor markets with all-positive or mixed-sign loadings. Before correction, the ratio of in-sample to true variance falls almost exactly on the curve (1 − d/m)<sup>2</sup>, whatever the market: the size of the bias depends on d/m and on nothing else. After correction every point sits at 1, including the one at d/m = 0.92, where the in-sample variance was 150 times too low.
+Figure 2 covers 20 simulated settings in six markets: independent stocks, AR(1) correlations, and one- and three-factor markets with all-positive or mixed-sign loadings. Before correction, the ratio of in-sample to true variance falls almost exactly on the curve (1 − d/m)<sup>2</sup>, whatever the market: the size of the bias depends on d/m and on nothing else. After correction every point sits at 1, including the one at d/m = 0.92, where the in-sample variance was 150 times too low.
 
 ![Accuracy of the correction in 20 simulated markets](img/figure-002.svg)
 
@@ -78,7 +78,7 @@ Using p instead of d is not a harmless approximation:
 
 The two agree only when almost every stock is held, as for independent stocks at p/n = 0.2. The worst case is the market that looks most like a real equity market — every stock loads positively on the market factor — where the optimizer holds only 17% to 35% of the stocks. There the classical correction is further from the truth than no correction at all.
 
-The 1/√m rate is visible too. In four markets with m from 50 to 400, √m times the mean relative error stays between 0.57 and 1.27.
+The 1/√m rate is visible too. In four markets with m from 50 to 400, √m times the mean of a symmetric relative error, |R<sub>out</sub> − estimate| / (R<sub>out</sub> + estimate), stays between 0.57 and 1.27.
 
 These are averages. In a single sample the corrected value still scatters: its standard deviation across samples grows from 0.10 at small d/m to 0.49 at d/m = 0.92. The bound in the theorem is a bound on the expected error, not a prediction interval.
 
@@ -90,21 +90,21 @@ Whether this happens is decided by one number: the statistical dimension δ of t
 
 ![Probability of zero in-sample risk against m over the statistical dimension](img/figure-003.svg)
 
-***Figure 3** δ ranges from 17 to 199 across the five markets, but all five curves cross 1/2 at m/δ between 0.96 and 1.00.*
+***Figure 3** δ ranges from 17 to 200 across the five markets, but all five curves cross 1/2 at m/δ between 0.96 and 1.00.*
 
 Three markets make it concrete:
 
-- **Independent stocks, long-only.** δ = p/2, so the portfolio breaks at p = 2m. This is the threshold that [Kondor, Papp and Caccioli (2017)](https://arxiv.org/abs/1612.07067) found with the replica method; their equations also imply our correction for this case, though they did not state it. Up to the threshold the long-only portfolio's true variance stays within a factor π of the best possible, while the unconstrained portfolio blows up at p = m.
-- **AR(1) correlations.** δ ≈ 0.30p, so the threshold is at p ≈ 3.3m.
-- **One factor, all loadings positive.** δ grows only like log p. The market factor cannot be hedged without short positions, so the long-only portfolio essentially never breaks.
+- **Independent stocks, long-only.** δ = p/2, so the portfolio breaks at p = 2m. This is the threshold that [Kondor, Papp and Caccioli (2017)](https://arxiv.org/abs/1612.07067) found with the replica method; their equations also imply our correction for this case, though they did not state it. In the large-sample limit, up to the threshold, the long-only portfolio's true variance stays within a factor π of the best possible, while the unconstrained portfolio blows up at p = m.
+- **AR(1) correlations (parameter 0.5).** By Monte Carlo, δ ≈ 0.30p, so the threshold is at p ≈ 3.3m.
+- **One factor, all loadings positive.** δ grows only like log p. The market factor cannot be hedged without short positions, so the long-only portfolio does not break until the number of stocks grows exponentially in the number of days.
 
 When loadings take both signs, the factor can be hedged inside the long-only set and δ grows in proportion to p again. The NASDAQ data show exactly this. With quarterly windows the long-only portfolio reported zero risk in 3%, 19% and 28% of windows for 500, 1,000 and 1,455 stocks — all of them windows ending by early March 2020, in the calm period when many stocks had market loadings near zero or below it.
 
-Below the threshold the correction keeps working. The convex Gaussian min–max theorem (see [Thrampoulidis, Abbasi and Hassibi, 2018](https://arxiv.org/abs/1601.06233)) gives the limits of both variances, without assuming that the unconstrained optimum satisfies the constraints. In that limit the correction is exact, and it carries over to the observed d at a rate of (log m / m)<sup>1/4</sup>.
+Well below the threshold the correction keeps working. When δ is at most a fixed fraction of m, p/m is bounded and the constraints do not bind too hard in the population, the convex Gaussian min–max theorem (see [Thrampoulidis, Abbasi and Hassibi, 2018](https://arxiv.org/abs/1601.06233)) gives the limits of both variances, without assuming that the unconstrained optimum satisfies the constraints. In that limit the correction is exact, and it carries over to the observed d at a rate of (log m / m)<sup>1/4</sup>. In one-factor markets with positive loadings, where the constraint binds hard, a separate asymptotic argument shows that the correction removes the leading bias.
 
 # 6 Tracking-error budgets
 
-An active manager maximizes an alpha signal subject to a cap on tracking error against a benchmark. Practitioners know that realized tracking error comes out above the ex-ante number — by 1.3 to 1.4 times in backtests with commercial risk models ([Saxena and Stubbs, 2012](https://scinapse.io/papers/2068160108)) — and add a buffer to the ex-ante estimate ([De Nard, Ledoit and Wolf, 2025](https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf)).
+An active manager maximizes an alpha signal subject to a cap on tracking error against a benchmark. Practitioners know that realized tracking error comes out above the ex-ante number — by about 1.37 times in backtests with a commercial risk model ([Saxena and Stubbs, 2012](https://scinapse.io/papers/2068160108)) — and add a buffer to the ex-ante estimate ([De Nard, Ledoit and Wolf, 2025](https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf)).
 
 The same correction says how large the buffer should be: choose the in-sample cap so that TE<sub>in</sub> / (1 − d/m) equals the target, where d is the face dimension of the tracking-error portfolio. Tracking error is a standard deviation, so the factor is not squared.
 
@@ -126,14 +126,14 @@ With more stocks than days, something new appears: a floor. As the in-sample bud
 
 ***Figure 4** The calibrated portfolio lands near max(target, floor); capping in-sample tracking error at the target overshoots everywhere.*
 
-Where the floor lies below the target in most windows, the calibrated portfolio realizes 0.94 to 1.05 times the target, against 1.38 to 1.78 for the naive cap. Below the floor it realizes 1.02 to 1.07 times the floor, which is about as good as it gets. The floors are not small: medians of 5.4% and 7.3% a year with quarterly windows, 3.0% with one-year windows and 500 stocks, and 1.7% among the 500 least volatile stocks — well inside common mandate ranges.
+In random universes where the floor lies below the target in at least 85% of windows, the calibrated portfolio realizes 0.94 to 1.05 times the target, against 1.38 to 1.78 for the naive cap. Among the 500 least volatile stocks it still lands up to 22% above target; that remainder traces to drift rather than optimism, since an optimism-free split-sample forecast is itself 6% to 13% too low there. Below the floor it realizes 1.02 to 1.07 times the floor, which is about as good as it gets. The floors are not small: medians of 5.4% and 7.3% a year with quarterly windows, 3.0% with one-year windows and 500 stocks, and 1.7% among the 500 least volatile stocks — well inside common mandate ranges.
 
 # 7 What it does not fix
 
 - **It does not raise the Sharpe ratio.** The weights are the same; the correction changes what you believe about their risk. Scaling a portfolio to a volatility target with an honest number does not change its Sharpe ratio either. It makes realized volatility land where you aimed.
 - **A common daily shock.** If all stocks share a random scale each day (elliptical returns, volatility clustering), the formula comes out 7.5% to 38% too low in our simulations. Refitted leave-one-out — the jackknife — stays between 0.95 and 1.07 there, so report both.
-- **Drift.** On NASDAQ the corrected minimum-variance forecast is still 1.1 to 1.5 times too low against an equal-weight reference. A split-sample forecast, which has no optimization bias at all, is also too low, by 1.02 to 1.41 times: the covariance moves between the estimation window and the holding period, and nothing computed inside one window can see that.
-- **Factor risk models.** Most institutions do not optimize on the sample covariance. The theory covers the sample covariance, fixed ridge shrinkage and, as a proposal, exponential weights. What plays the role of d for a portfolio built on a factor-model or nodewise estimate is open.
+- **Drift.** On NASDAQ, measured against an equal-weight reference, realized variance is still 1.1 to 1.5 times the corrected minimum-variance forecast. A split-sample forecast, which has no optimization bias at all, is also too low (realized variance is 1.02 to 1.41 times the forecast): the covariance moves between the estimation window and the holding period, and nothing computed inside one window can see that.
+- **Factor risk models.** Most institutions do not optimize on the sample covariance. The theory covers the sample covariance, fixed ridge shrinkage and, as a proposal, exponential weights. What plays the role of d for a portfolio built on a factor-model or other regularized estimate is open.
 - **The data.** The NASDAQ panel (1,455 stocks, January 2018 to May 2023, from [skfolio-datasets](https://github.com/skfolio/skfolio-datasets)) contains survivors only and is distributed as test data. The empirical part illustrates the method; it does not evaluate these stocks. The theory assumes Gaussian, independent returns.
 
 # 8 How to use it
@@ -168,3 +168,6 @@ Where the floor lies below the target in most windows, the calibrated portfolio 
 11\. De Nard, G., Ledoit, O., and Wolf, M. (2025). Improved Tracking-Error Management for Active and Passive Investing. The Journal of Portfolio Management. [https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf](https://econ.uzh.ch/dam/jcr:8f7e20cf-e9a7-4fde-87cb-aef82de26404/jpm_2025.pdf)
 
 12\. skfolio-datasets: datasets distributed with the skfolio library (NASDAQ daily prices). [https://github.com/skfolio/skfolio-datasets](https://github.com/skfolio/skfolio-datasets)
+
+
+13\. Celentano, M., and Montanari, A. (2022). Fundamental barriers to high-dimensional regression with convex penalties. The Annals of Statistics. arXiv:1903.10603. [https://arxiv.org/abs/1903.10603](https://arxiv.org/abs/1903.10603)

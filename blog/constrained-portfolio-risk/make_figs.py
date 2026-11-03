@@ -4,7 +4,8 @@ Usage: python3 make_figs.py img
 
 Numbers are copied from the raw outputs of the paper's reproducibility package:
   SIM_DF     <- data/sim_df.csv        (Table 2 / Figure 1 of the paper; 400 samples per row, n = 250)
-  PHASE      <- data/phase_p400.csv    (Figure 2 of the paper; p = 400, 100 samples per point)
+  PHASE      <- data/phase_p400.csv    (Figure 2 of the paper; p = 400, 100 samples per point; delta = p/2 = 200
+             exactly for independent stocks, as in the paper's figure, instead of the Monte Carlo 199.381)
   TE_NASDAQ  <- data/te_nasdaq_pgn.csv (Figure 3(b) of the paper; medians over monthly windows)
 Palette follows blog/assets/style.css: ink #172033, muted #667085, navy #00205b, royal blue #4169e1.
 """
@@ -46,10 +47,10 @@ SIM_DF = [
 
 # market, statistical dimension delta, m, share of samples with zero in-sample variance
 PHASE = [
-    ("iid", 199.381, 100, 1.000), ("iid", 199.381, 140, 1.000), ("iid", 199.381, 160, 1.000),
-    ("iid", 199.381, 179, 0.970), ("iid", 199.381, 199, 0.500), ("iid", 199.381, 219, 0.020),
-    ("iid", 199.381, 239, 0.000), ("iid", 199.381, 259, 0.000), ("iid", 199.381, 299, 0.000),
-    ("iid", 199.381, 359, 0.000),
+    ("iid", 200.0, 100, 1.000), ("iid", 200.0, 140, 1.000), ("iid", 200.0, 160, 1.000),
+    ("iid", 200.0, 179, 0.970), ("iid", 200.0, 199, 0.500), ("iid", 200.0, 219, 0.020),
+    ("iid", 200.0, 239, 0.000), ("iid", 200.0, 259, 0.000), ("iid", 200.0, 299, 0.000),
+    ("iid", 200.0, 359, 0.000),
     ("ar1", 120.571, 60, 1.000), ("ar1", 120.571, 84, 1.000), ("ar1", 120.571, 96, 0.990),
     ("ar1", 120.571, 109, 0.900), ("ar1", 120.571, 121, 0.440), ("ar1", 120.571, 133, 0.060),
     ("ar1", 120.571, 145, 0.010), ("ar1", 120.571, 157, 0.000), ("ar1", 120.571, 181, 0.000),
@@ -90,17 +91,17 @@ LANG = {
         "f1_pin": "weight of C pinned at 0",
         "f1_free": "free to slide: 1 direction",
         "f2_title": "Before correction the ratio follows (1 − d/m)²; after it, the ratio sits at 1",
-        "f2_sub": ["20 simulated markets, n = 250 days, p = 125 to 1,000 stocks, 400 samples each.",
+        "f2_sub": ["20 settings in six simulated markets, n = 250 days, p = 125 to 1,000 stocks, 400 samples each.",
                    "Ratio to the true out-of-sample variance; bars are ±2 standard errors."],
         "f2_x": "share of free directions, d/m",
         "f2_corr": "corrected: R_in / (1 − d/m)²",
         "f2_unc": "uncorrected: R_in",
         "f2_curve": "(1 − d/m)²",
-        "f3_title": "The portfolio breaks when m falls below the statistical dimension δ",
+        "f3_title": "Zero in-sample risk sets in as m falls below the statistical dimension δ",
         "f3_sub": ["Long-only, p = 400 stocks, five markets, 100 samples per point.",
                    "Share of samples whose minimum in-sample variance is exactly zero."],
         "f3_x": "days over statistical dimension, m/δ",
-        "f3_names": {"iid": "independent, δ = 199", "ar1": "AR(1), δ = 121", "f1mixed": "one factor, mixed signs, δ = 130",
+        "f3_names": {"iid": "independent, δ = p/2 = 200", "ar1": "AR(1), δ = 121", "f1mixed": "one factor, mixed signs, δ = 130",
                      "f1pos": "one factor, positive, δ = 17", "f3pos": "three factors, positive, δ = 18"},
         "f4_title": "On NASDAQ data the calibrated portfolio tracks max(target, floor)",
         "f4_sub": ["More stocks than days. Median realized tracking error over target, monthly windows.",
@@ -121,17 +122,17 @@ LANG = {
         "f1_pin": "C 的权重被钉在 0",
         "f1_free": "只能沿边滑动：1 个方向",
         "f2_title": "校正前，比值沿着 (1 − d/m)² 走；校正后，贴在 1 上",
-        "f2_sub": ["20 个模拟市场，n = 250 天，p = 125 到 1,000 只股票，每个 400 次。",
+        "f2_sub": ["六种模拟市场下的 20 个设定，n = 250 天，p = 125 到 1,000 只股票，每个 400 次。",
                    "纵轴是与真实样本外方差之比；误差棒为 ±2 个标准误。"],
         "f2_x": "自由方向占比 d/m",
         "f2_corr": "校正后：R_in / (1 − d/m)²",
         "f2_unc": "未校正：R_in",
         "f2_curve": "(1 − d/m)²",
-        "f3_title": "天数 m 一旦低于统计维数 δ，组合就会崩成样本内零风险",
+        "f3_title": "天数 m 跌破统计维数 δ，样本内零风险就随之出现",
         "f3_sub": ["禁止卖空，p = 400 只股票，五个市场，每个点 100 次。",
                    "纵轴：样本内最小方差恰好为零的样本占比。"],
         "f3_x": "天数与统计维数之比 m/δ",
-        "f3_names": {"iid": "独立资产，δ = 199", "ar1": "AR(1)，δ = 121", "f1mixed": "单因子、载荷有正有负，δ = 130",
+        "f3_names": {"iid": "独立资产，δ = p/2 = 200", "ar1": "AR(1)，δ = 121", "f1mixed": "单因子、载荷有正有负，δ = 130",
                      "f1pos": "单因子、载荷全正，δ = 17", "f3pos": "三因子、载荷全正，δ = 18"},
         "f4_title": "纳斯达克数据上，校准后的实际跟踪误差 ≈ max(目标, 地板)",
         "f4_sub": ["股票比天数多。月度窗口的中位数：实际跟踪误差 ÷ 目标。",
